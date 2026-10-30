@@ -1,0 +1,16 @@
+@page "/not-found"
+@layout MainLayout
+
+<PageTitle>@T["Page not found"]</PageTitle>
+<HeadContent><meta name="robots" content="noindex" /></HeadContent>
+
+<div class="site-container flex flex-col items-center py-24 text-center">
+    <p class="eyebrow">@T["Error 404"]</p>
+    <h1 class="display-title mt-3 text-4xl sm:text-5xl">@T["Page not found"]</h1>
+    <div class="gold-rule mt-6"></div>
+    <p class="mt-6 max-w-md text-stone-600">@T["The page does not exist, or the item is no longer in the public collection."]</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="sbirka" class="btn rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-800">@T["Browse the collection"]</a>
+        <a href="" class="btn rounded-full px-6 py-3 text-stone-700 ring-1 ring-stone-300 ring-inset hover:bg-white">@T["Home page"]</a>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+@page "/admin/ciselniky"
+@rendermode InteractiveServer
+
+@using CollectionCatalog.Web.Services.Codebooks
+
+@inject NavigationManager Navigation
+
+<PageTitle>@T["Codebooks – administration"]</PageTitle>
+
+<PageHeader Title="@T["Codebooks"]">
+    <Description>@T["Item types, categories and countries to choose from in the editor, and the languages of the website."]</Description>
+</PageHeader>
+
+<FilterTabs TValue="string" Options="TabOptions" Selected="ActiveSection" OnSelect="Select" Label="@T["Codebook"]" CssClass="mb-6" />
+
+@if (ActiveSection == LanguagesSection)
+{
+    <LanguagePanel />
+}
+else
+{
+    <CodebookPanel @key="ActiveKind" Kind="ActiveKind" />
+}
+
+@code {
+    private static readonly (string Key, string Label, CodebookKind Kind)[] _tabs =
+    [
+        ("typy", "Item types", CodebookKind.ItemTypes),
+        ("kategorie", "Categories", CodebookKind.Categories),
+        ("zeme", "Countries", CodebookKind.Countries),
+    ];
+
+    private const string LanguagesSection = "jazyky";
+
+    [SupplyParameterFromQuery(Name = "sekce")]
+    public string? Section { get; set; }
+
+    private (string, string)[] TabOptions => [.. _tabs.Select(t => (t.Key, T[t.Label].Value)), (LanguagesSection, T["Languages"].Value)];
+
+    private string ActiveSection => Section == LanguagesSection || _tabs.Any(t => t.Key == Section) ? Section! : _tabs[0].Key;
+
+    private CodebookKind ActiveKind => _tabs.FirstOrDefault(t => t.Key == ActiveSection).Kind;
+
+    private void Select(string section) =>
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameter("sekce", section), replace: true);
+}

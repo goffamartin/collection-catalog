@@ -1,0 +1,34 @@
+@inject InquiryService Inquiries
+
+@* Items of the main administration navigation (sidebar and mobile menu). The layout is static – the number of new
+   inquiries is loaded on every page change. *@
+<NavLink href="@AdminUrls.Items" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-400 transition hover:bg-white/5 hover:text-white"
+         ActiveClass="!bg-white/10 !text-white">
+    <span class="icon-[lucide--layout-grid] size-4"></span> @T["Items"]
+</NavLink>
+<NavLink href="@AdminUrls.Listings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-400 transition hover:bg-white/5 hover:text-white"
+         ActiveClass="!bg-white/10 !text-white">
+    <span class="icon-[lucide--tag] size-4"></span> @T["Offers"]
+</NavLink>
+<NavLink href="@AdminUrls.Inquiries" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-400 transition hover:bg-white/5 hover:text-white"
+         ActiveClass="!bg-white/10 !text-white">
+    <span class="icon-[lucide--inbox] size-4"></span> @T["Inquiries"]
+    @if (_newCount > 0)
+    {
+        <span class="ml-auto rounded-full bg-amber-500 px-2 py-0.5 text-xs font-semibold text-stone-950">@_newCount</span>
+    }
+</NavLink>
+<NavLink href="@AdminUrls.Codebooks" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-400 transition hover:bg-white/5 hover:text-white"
+         ActiveClass="!bg-white/10 !text-white">
+    <span class="icon-[lucide--tags] size-4"></span> @T["Codebooks"]
+</NavLink>
+<NavLink href="@AdminUrls.Settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-400 transition hover:bg-white/5 hover:text-white"
+         ActiveClass="!bg-white/10 !text-white">
+    <span class="icon-[lucide--settings] size-4"></span> @T["Website settings"]
+</NavLink>
+
+@code {
+    private int _newCount;
+
+    protected override async Task OnInitializedAsync() => _newCount = await Inquiries.CountNewAsync();
+}

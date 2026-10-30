@@ -1,0 +1,41 @@
+@* Visibility in the public collection and the description for visitors. Part of the item editor form (EditContext comes from the EditForm). *@
+<section class="card">
+    <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--globe] size-4 text-amber-600"></span> @T["Presentation on the website"]</h2></div>
+    <div class="card-body space-y-5">
+        <Toggle @bind-Value="PublicVisibility" Label="@T["Show in the public collection"]"
+                Description="@T["Visitors see the name, description, public photos and basic details – never prices or private notes."]" />
+        <Toggle @bind-Value="Featured" Label="@T["Feature on the home page"]" Description="@T["Selected pieces appear on the home page of the website."]" />
+        <div>
+            <label for="public-description" class="form-label">@T["Description for visitors"]<LanguageMark Code="@Model.EditLanguage" /></label>
+            <InputTextArea id="public-description" @bind-Value="Model.PublicDescription" rows="5" class="form-input"
+                           placeholder="@(Model.Fallback(Model.PublicDescriptionText) ?? T["Where the piece comes from, its story, interesting facts…"])" />
+            <ValidationMessage For="() => Model.PublicDescription" />
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ItemEditModel Model { get; set; } = null!;
+    [CascadingParameter] private EditContext EditContext { get; set; } = null!;
+
+    // Toggles are not EditForm inputs – report the change to the EditContext ourselves.
+    private bool PublicVisibility
+    {
+        get => Model.Visibility == ItemVisibility.Public;
+        set
+        {
+            Model.Visibility = value ? ItemVisibility.Public : ItemVisibility.Private;
+            EditContext.NotifyFieldChanged(FieldIdentifier.Create(() => Model.Visibility));
+        }
+    }
+
+    private bool Featured
+    {
+        get => Model.IsFeatured;
+        set
+        {
+            Model.IsFeatured = value;
+            EditContext.NotifyFieldChanged(FieldIdentifier.Create(() => Model.IsFeatured));
+        }
+    }
+}

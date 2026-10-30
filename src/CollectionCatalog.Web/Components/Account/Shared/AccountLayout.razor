@@ -1,0 +1,22 @@
+@inherits LayoutComponentBase
+@inject SiteSettingsService SiteSettings
+
+@* Layout of the sign-in (static SSR page) – a subtle golden gradient in the background, a card in the middle. *@
+<div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-paper px-4 py-12">
+    <div class="pointer-events-none absolute inset-x-0 -top-40 h-96 bg-gradient-to-b from-amber-100/70 to-transparent blur-2xl"></div>
+    <div class="relative w-full max-w-sm">
+        <a href="" class="mb-8 flex flex-col items-center gap-3">
+            <LogoIcon Large CssClass="shadow-lg shadow-stone-900/20" />
+            <span class="font-display text-xl font-medium tracking-tight text-stone-900">@_siteName</span>
+        </a>
+        <div class="card p-6 sm:p-8">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _siteName;
+
+    protected override async Task OnInitializedAsync() => _siteName = (await SiteSettings.GetAsync()).SiteName;
+}

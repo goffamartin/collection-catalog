@@ -1,0 +1,13 @@
+@* Row with a value in the item detail; an empty value is not rendered. *@
+@if (!string.IsNullOrEmpty(Value))
+{
+    <div class="flex gap-4 py-3.5">
+        <dt class="w-28 shrink-0 text-sm text-stone-500 sm:w-36">@Label</dt>
+        <dd class="text-sm font-medium text-stone-900">@Value</dd>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string? Value { get; set; }
+}

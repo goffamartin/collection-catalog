@@ -1,0 +1,49 @@
+@* Sortable table column header – a click sorts, another click reverses the direction. *@
+<th class="px-3 py-3 @(AlignRight ? "text-right" : "") @CssClass" aria-sort="@AriaSort">
+    <button type="button" class="inline-flex items-center gap-1 transition hover:text-stone-900 @(IsActive ? "text-stone-900" : "")" @onclick="() => OnSort.InvokeAsync(Column)">
+        @Title
+        @if (IsActive)
+        {
+            @if (Descending)
+            {
+                <span class="icon-[lucide--arrow-down] size-3"></span>
+            }
+            else
+            {
+                <span class="icon-[lucide--arrow-up] size-3"></span>
+            }
+        }
+        else
+        {
+            <span class="icon-[lucide--arrow-up-down] size-3 opacity-40"></span>
+        }
+    </button>
+</th>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public SortColumn Column { get; set; }
+
+    [Parameter, EditorRequired]
+    public SortColumn Current { get; set; }
+
+    [Parameter]
+    public bool Descending { get; set; }
+
+    [Parameter]
+    public bool AlignRight { get; set; }
+
+    /// <summary>Extra classes of the cell, e.g. to hide the column on narrow screens.</summary>
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    [Parameter]
+    public EventCallback<SortColumn> OnSort { get; set; }
+
+    private bool IsActive => Column == Current;
+
+    private string AriaSort => IsActive ? (Descending ? "descending" : "ascending") : "none";
+}

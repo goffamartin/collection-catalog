@@ -1,0 +1,286 @@
+@inject ListingService Listings
+@inject LanguageService Languages
+@inject ILogger<ItemListingPanel> Logger
+
+@* The fields of the panel have form="listing-panel" (no form has that id): so they do not belong to the item form
+   and Enter in the price does not submit (save) the item. *@
+@* Offer for sale in the item editor. Saved separately (with its own button) and uses neither EditForm nor Input*
+   components – it lies inside the item form, whose EditContext would otherwise report unsaved changes of the item. *@
+<section class="card">
+    <div class="card-header">
+        <h2 class="card-title"><span class="icon-[lucide--tag] size-4 text-amber-600"></span> @T["Offer for sale"]</h2>
+        @if (_saved?.Id is not null)
+        {
+            <span class="@($"badge {StatusClass(_saved.Status)}")">@_saved.Status.Label()</span>
+        }
+    </div>
+
+    @if (_model is null)
+    {
+        <div class="card-body flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-stone-500">
+                @(_notice ?? T["The item is not on offer."])
+                @if (_closedCount > 0)
+                {
+                    <span class="text-stone-500"> · @T["earlier offers: {0}", _closedCount]</span>
+                }
+            </p>
+            <button type="button" class="btn-secondary btn-sm" @onclick="StartNew">
+                <span class="icon-[lucide--plus] size-3.5"></span> @AppText.In("action", "Offer for sale")
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="card-body grid gap-5 sm:grid-cols-2">
+            <div>
+                <label for="listing-status" class="form-label">@T["Status"]</label>
+                <select id="listing-status" form="listing-panel" class="form-input" @bind="_model.Status" @bind:after="Changed">
+                    @foreach (var status in Enum.GetValues<ListingStatus>())
+                    {
+                        <option value="@status">@status.Label()</option>
+                    }
+                </select>
+                <p class="form-hint">@StatusHint(_model.Status)</p>
+            </div>
+            <div>
+                <label for="listing-price" class="form-label">@T["Asking price"]</label>
+                <div class="relative">
+                    <input id="listing-price" form="listing-panel" type="number" min="0" step="1" inputmode="numeric" placeholder="@T["price on request"]"
+                           class="form-input pr-10 tabular-nums" @bind="_model.AskingPrice" @bind:after="Changed" />
+                    <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-stone-500">@Money.Symbol</span>
+                </div>
+                <p class="form-hint">@T["Empty = „price on request“. The price is public on the website."]</p>
+            </div>
+
+            @if (_model.Status == ListingStatus.Sold)
+            {
+                <div class="sm:col-span-2 rounded-lg bg-stone-50 p-4 ring-1 ring-stone-200">
+                    <label for="listing-sale-price" class="form-label">@T["What it sold for"]</label>
+                    <div class="relative sm:w-1/2">
+                        <input id="listing-sale-price" form="listing-panel" type="number" min="0" step="1" inputmode="numeric" placeholder="@(_model.AskingPrice?.ToString("0") ?? "")"
+                               class="form-input pr-10 tabular-nums" @bind="_model.SalePrice" @bind:after="Changed" />
+                        <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-stone-500">@Money.Symbol</span>
+                    </div>
+                    <p class="form-hint">@T["Filled into the sale details of the item (unless something is already there), together with today's date."]</p>
+                </div>
+            }
+
+            <div class="space-y-4 sm:col-span-2">
+                <Toggle Value="_model.AcceptsOffers" ValueChanged="v => { _model.AcceptsOffers = v; return Changed(); }"
+                        Label="@T["Buyers can propose a price"]" Description="@T["The form will have the field „Your price offer“."]" />
+                <Toggle Value="_model.OpenToTrade" ValueChanged="v => { _model.OpenToTrade = v; return Changed(); }"
+                        Label="@T["Trade possible"]" Description="@T["The website shows that the piece can also be traded."]" />
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="listing-note" class="form-label">@T["Note to the offer"]<LanguageMark Code="@Language" /></label>
+                <textarea id="listing-note" rows="3" class="form-input" maxlength="@ListingEditModel.MaxNoteLength"
+                          placeholder="@(_model.Fallback(_model.PublicNoteText) ?? T["e.g. condition details, possible handover in person…"])"
+                          @bind="_model.PublicNote" @bind:after="Changed"></textarea>
+                <p class="form-hint">@T["Public – shown with the offer on the website."]</p>
+            </div>
+
+            @if (!ItemIsPublic && _model.Status is ListingStatus.Active or ListingStatus.Reserved)
+            {
+                <p class="flex gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-900 ring-1 ring-amber-200 sm:col-span-2">
+                    <span class="icon-[lucide--info] mt-px size-4 shrink-0"></span>
+                    @T["The item is not in the public collection – on the website it will be visible only in the offers (photos marked as public)."]
+                </p>
+            }
+
+            @if (_error is not null)
+            {
+                <p class="text-sm font-medium text-red-600 sm:col-span-2">@_error</p>
+            }
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 px-5 py-3">
+            <div class="flex flex-wrap items-center gap-3 text-sm">
+                @if (_saved?.Id is { } listingId)
+                {
+                    <a href="@AdminUrls.InquiriesForListing(listingId)" class="inline-flex items-center gap-1.5 text-stone-600 hover:text-amber-700">
+                        <span class="icon-[lucide--inbox] size-4"></span> @T["Inquiries: {0}", _saved.InquiryCount]
+                        @if (_saved.NewInquiryCount > 0)
+                        {
+                            <span class="badge bg-amber-500 text-white">@T["{0} new", _saved.NewInquiryCount]</span>
+                        }
+                    </a>
+                    @if (_saved.Status is ListingStatus.Active or ListingStatus.Reserved)
+                    {
+                        <a href="@PublicUrls.Offer(listingId, ItemName)" target="_blank" class="inline-flex items-center gap-1 text-amber-700 hover:underline">
+                            @T["On the website"] <span class="icon-[lucide--external-link] size-3.5"></span>
+                        </a>
+                    }
+                }
+            </div>
+            <div class="flex items-center gap-2">
+                @if (_savedRecently)
+                {
+                    <span class="flex items-center gap-1.5 text-sm font-medium text-emerald-700"><span class="icon-[lucide--circle-check] size-4"></span> @T["Saved"]</span>
+                }
+                @if (_dirty)
+                {
+                    <button type="button" class="btn-ghost btn-sm" @onclick="Cancel">@(_saved?.Id is null ? T["Cancel"] : T["Discard changes"])</button>
+                }
+                <button type="button" class="btn-accent btn-sm" disabled="@(_saving || !_dirty)" @onclick="SaveAsync">
+                    <span class="icon-[lucide--save] size-3.5"></span> @T["Save offer"]
+                </button>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public int ItemId { get; set; }
+    [Parameter, EditorRequired] public string ItemName { get; set; } = "";
+    [Parameter] public bool ItemIsPublic { get; set; }
+
+    /// <summary>Language of the public note being edited (chosen in the item editor).</summary>
+    [Parameter, EditorRequired] public string Language { get; set; } = "";
+
+    /// <summary>A sale through the offer filled in the sale price / date of the item – the editor must take them over.</summary>
+    [Parameter] public EventCallback<ListingSaveResult> OnSaleRecorded { get; set; }
+
+    /// <summary>The panel has / does not have an unsaved offer (for the warning before leaving the page).</summary>
+    [Parameter] public EventCallback<bool> DirtyChanged { get; set; }
+
+    private ListingEditModel? _model;
+    private ListingEditModel? _saved;
+    private int _closedCount;
+    private bool _dirty;
+    private bool _saving;
+    private bool _savedRecently;
+    private string? _error;
+    private string? _notice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _saved = await Listings.GetOpenForItemAsync(ItemId);
+        _model = _saved is null ? null : Copy(_saved);
+        _closedCount = await Listings.CountClosedForItemAsync(ItemId);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_model is not null)
+        {
+            _model.EditLanguage = Language;
+        }
+    }
+
+    private Task StartNew()
+    {
+        _model = new ListingEditModel { Status = ListingStatus.Active, EditLanguage = Language, DefaultLanguage = Languages.Default.Code };
+        _saved = null;
+        _notice = null;
+        return SetDirtyAsync(true);
+    }
+
+    private Task Changed()
+    {
+        _savedRecently = false;
+        _error = null;
+        return SetDirtyAsync(true);
+    }
+
+    private Task Cancel()
+    {
+        _model = _saved is null ? null : Copy(_saved);
+        _error = null;
+        return SetDirtyAsync(false);
+    }
+
+    private async Task SetDirtyAsync(bool dirty)
+    {
+        if (_dirty != dirty)
+        {
+            _dirty = dirty;
+            await DirtyChanged.InvokeAsync(dirty);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null)
+        {
+            return;
+        }
+        if (_model.AskingPrice < 0 || _model.SalePrice < 0)
+        {
+            _error = T["The price cannot be negative."];
+            return;
+        }
+
+        _saving = true;
+        try
+        {
+            var closing = _model.Status is ListingStatus.Sold or ListingStatus.Withdrawn;
+            ListingSaveResult? result = null;
+            if (!await SafeAction.RunAsync(Logger, "saving an offer", async () => result = await Listings.SaveAsync(ItemId, _model)))
+            {
+                _error = T[SafeAction.Message];
+                return;
+            }
+            if (result!.Error is { } error)
+            {
+                _error = error;
+                return;
+            }
+            await SetDirtyAsync(false);
+
+            if (closing)
+            {
+                _closedCount++;
+                _notice = _model.Status == ListingStatus.Sold ? T["The offer was closed as sold."] : T["The offer was withdrawn."];
+                _model = null;
+                _saved = null;
+                if (result.ItemSalePrice is not null || result.ItemSaleDate is not null)
+                {
+                    await OnSaleRecorded.InvokeAsync(result);
+                }
+                return;
+            }
+
+            _saved = await Listings.GetOpenForItemAsync(ItemId);
+            _model = _saved is null ? null : Copy(_saved);
+            _savedRecently = true;
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private ListingEditModel Copy(ListingEditModel m) => new()
+    {
+        EditLanguage = Language,
+        DefaultLanguage = m.DefaultLanguage,
+        Id = m.Id,
+        Status = m.Status,
+        AskingPrice = m.AskingPrice,
+        AcceptsOffers = m.AcceptsOffers,
+        OpenToTrade = m.OpenToTrade,
+        PublicNoteText = m.PublicNoteText,
+        InquiryCount = m.InquiryCount,
+        NewInquiryCount = m.NewInquiryCount,
+    };
+
+    private string StatusHint(ListingStatus status) => status switch
+    {
+        ListingStatus.Draft => T["Prepared, not on the website yet."],
+        ListingStatus.Active => T["On the website in the Offers section."],
+        ListingStatus.Reserved => T["On the website marked „Reserved“."],
+        ListingStatus.Sold => T["After saving, the offer is closed and disappears from the website."],
+        ListingStatus.Withdrawn => T["After saving, the offer is closed and disappears from the website."],
+        _ => "",
+    };
+
+    public static string StatusClass(ListingStatus status) => status switch
+    {
+        ListingStatus.Active => "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/15",
+        ListingStatus.Reserved => "bg-amber-50 text-amber-800 ring-1 ring-amber-600/20",
+        ListingStatus.Sold => "bg-stone-800 text-white",
+        _ => "bg-stone-100 text-stone-600",
+    };
+}

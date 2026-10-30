@@ -1,0 +1,23 @@
+@* Status badge of an item in lists and in the editor. *@
+@switch (Kind)
+{
+    case ItemBadgeKind.Public:
+        <span class="badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/15"><span class="icon-[lucide--eye] size-3"></span> @T["Public"]</span>
+        break;
+    case ItemBadgeKind.Private:
+        <span class="badge bg-stone-100 text-stone-600"><span class="icon-[lucide--eye-off] size-3"></span> @T["Private"]</span>
+        break;
+    case ItemBadgeKind.NotInCollection:
+        <span class="badge bg-stone-100 text-stone-600" title="@T["The item is not in the public collection"]"><span class="icon-[lucide--eye-off] size-3"></span> @T["not in collection"]</span>
+        break;
+    case ItemBadgeKind.InOffer:
+        <span class="badge bg-amber-50 text-amber-700 ring-1 ring-amber-600/20"><span class="icon-[lucide--tag] size-3"></span> @T["On offer"]</span>
+        break;
+    case ItemBadgeKind.Sold:
+        <span class="badge bg-stone-800 text-white">@T["Sold"]</span>
+        break;
+}
+
+@code {
+    [Parameter, EditorRequired] public ItemBadgeKind Kind { get; set; }
+}

@@ -1,0 +1,98 @@
+@inherits LayoutComponentBase
+@inject SiteSettingsService SiteSettings
+@inject SiteOptions Site
+
+@* Layout of the public website (static SSR). Mobile menu in a native <details> – no JavaScript. *@
+<a href="#obsah" data-skip-link class="sr-only z-50 rounded-lg bg-white px-4 py-2 text-sm font-medium text-stone-900 shadow-lg ring-2 ring-amber-500 focus:not-sr-only focus:fixed focus:top-3 focus:left-3">@T["Skip to content"]</a>
+<div class="flex min-h-screen flex-col bg-paper text-stone-900">
+    <header class="sticky top-0 z-30 border-b border-stone-200/70 bg-paper/85 backdrop-blur">
+        <div class="site-container flex h-16 items-center justify-between gap-4">
+            <a href="" class="group flex items-center gap-3">
+                <LogoIcon CssClass="group-hover:bg-stone-800" />
+                <span class="font-display text-xl font-medium tracking-tight">@_site?.SiteName</span>
+            </a>
+
+            <nav class="hidden items-center gap-1 sm:flex" aria-label="@T["Main navigation"]">
+                <NavLink href="sbirka" class="rounded-full px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-900/5 hover:text-stone-900"
+                         ActiveClass="!bg-stone-900/5 !text-stone-900">@T["Collection"]</NavLink>
+                <NavLink href="nabidka" class="rounded-full px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-900/5 hover:text-stone-900"
+                         ActiveClass="!bg-stone-900/5 !text-stone-900">@T["Offer"]</NavLink>
+                <NavLink href="o-sbirce" class="rounded-full px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-900/5 hover:text-stone-900"
+                         ActiveClass="!bg-stone-900/5 !text-stone-900">@T["About the collection"]</NavLink>
+                <NavLink href="kontakt" class="rounded-full px-4 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-900/5 hover:text-stone-900"
+                         ActiveClass="!bg-stone-900/5 !text-stone-900">@T["Contact"]</NavLink>
+                <LanguageSwitcher CssClass="ml-2 border-l border-stone-200 pl-2" />
+            </nav>
+
+            @* Phones: language and menu as two buttons side by side – a dropdown inside the menu would not scale. *@
+            <div class="flex items-center gap-1 sm:hidden">
+                <LanguageSwitcher />
+                <details class="relative" data-dropdown>
+                    <summary class="flex size-10 cursor-pointer list-none items-center justify-center rounded-full text-stone-700 hover:bg-stone-900/5" aria-label="Menu">
+                        <span class="icon-[lucide--menu] size-5"></span>
+                    </summary>
+                    <nav class="absolute right-0 mt-2 w-56 rounded-2xl bg-white p-2 shadow-xl ring-1 ring-stone-200" aria-label="@T["Main navigation"]">
+                        <a href="sbirka" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                            <span class="icon-[lucide--layout-grid] size-4 text-amber-700"></span> @T["Collection"]
+                        </a>
+                        <a href="nabidka" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                            <span class="icon-[lucide--tag] size-4 text-amber-700"></span> @T["Offer"]
+                        </a>
+                        <a href="o-sbirce" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                            <span class="icon-[lucide--book-open] size-4 text-amber-700"></span> @T["About the collection"]
+                        </a>
+                        <a href="kontakt" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                            <span class="icon-[lucide--mail] size-4 text-amber-700"></span> @T["Contact"]
+                        </a>
+                    </nav>
+                </details>
+            </div>
+        </div>
+    </header>
+
+    <main id="obsah" tabindex="-1" class="flex-1 focus:outline-none">
+        @Body
+    </main>
+
+    <footer class="mt-24 border-t border-stone-200/70">
+        <div class="site-container flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="font-display text-lg font-medium">@_site?.SiteName</p>
+                <p class="mt-1 text-sm text-stone-500">@T["Private collection"] · © @AppTime.LocalNow(TimeProvider.System).Year</p>
+                @if (Site.AuthorName is { Length: > 0 } author)
+                {
+                    <p class="mt-1 text-xs text-stone-500">
+                        @T["Website by"]:
+                        @if (Site.AuthorUrl is { Length: > 0 } authorUrl)
+                        {
+                            <a href="@authorUrl" target="_blank" rel="author noopener" class="underline-offset-4 hover:text-stone-700 hover:underline">@author</a>
+                        }
+                        else
+                        {
+                            @author
+                        }
+                    </p>
+                }
+            </div>
+            <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-600" aria-label="@T["Footer"]">
+                <a href="sbirka" class="hover:text-stone-900">@T["Collection"]</a>
+                <a href="nabidka" class="hover:text-stone-900">@T["Offer"]</a>
+                <a href="o-sbirce" class="hover:text-stone-900">@T["About the collection"]</a>
+                <a href="kontakt" class="hover:text-stone-900">@T["Contact"]</a>
+                <a href="ochrana-osobnich-udaju" class="hover:text-stone-900">@T["Privacy policy"]</a>
+            </nav>
+        </div>
+    </footer>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    @T["An unexpected error has occurred."]
+    <a href="." class="reload">@T["Reload"]</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private SiteInfo? _site;
+
+    protected override async Task OnInitializedAsync() => _site = await SiteSettings.GetAsync();
+}

@@ -1,0 +1,266 @@
+@page "/admin/predmety"
+@rendermode InteractiveServer
+
+@inject AdminItemQuery Query
+@inject ItemEditorService Editor
+@inject NavigationManager Navigation
+@inject ListNavigation ListNav
+@inject ILogger<Items> Logger
+@implements IDisposable
+
+<PageTitle>@T["Items – administration"]</PageTitle>
+
+<PageHeader Title="@T["Items"]">
+    <Description>@T["Records of the whole collection including private details."]</Description>
+    <Actions>
+        @* Buttons instead of links: Blazor would intercept <a href> as its own navigation (the detail would be in the history twice). *@
+        <button type="button" class="btn-primary" @onclick="() => ListNav.OpenFromListAsync(AdminUrls.NewItem)">
+            <span class="icon-[lucide--plus] size-4"></span> @T["New item"]
+        </button>
+    </Actions>
+</PageHeader>
+
+<div class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+    <StatTile Label="@AppText.In("count", "Items")" Value="@Format.Number(_rows.Count)" Icon="StatTile.Icons.Items"
+              Note="@T["{0} public", Format.Number(_rows.Count(r => r.Visibility == ItemVisibility.Public))]" />
+    <StatTile Label="@T["Purchase value"]" Value="@Format.Money(_rows.Sum(r => r.PurchasePrice ?? 0))" Icon="StatTile.Icons.Wallet" />
+    <StatTile Label="@T["Estimated value"]" Value="@Format.Money(_rows.Sum(r => r.EstimatedValue ?? 0))" Icon="StatTile.Icons.Trend" Accent="true" />
+    <StatTile Label="@T["Without photos"]" Value="@Format.Number(_rows.Count(r => r.ImageCount == 0))" Icon="StatTile.Icons.Camera"
+              Note="@T["pieces to photograph"]" />
+</div>
+
+<div class="card">
+    @if (_lookups is not null)
+    {
+        <ItemFilterBar State="_state" Lookups="_lookups" OnFilterChanged="() => UpdateUrl()" OnSearchChanged="SearchChangedAsync" />
+    }
+
+    @if (_selected.Count > 0)
+    {
+        <div class="flex flex-wrap items-center gap-2 border-b border-amber-200/70 bg-amber-50/70 px-4 py-2.5 text-sm">
+            <span class="mr-1 font-medium text-stone-900">@T["Selected: {0}", _selected.Count]</span>
+            <button type="button" class="btn-secondary btn-sm" disabled="@_bulkBusy" @onclick="() => SetVisibilityAsync(ItemVisibility.Public)">
+                <span class="icon-[lucide--eye] size-3.5"></span> @T["Publish"]
+            </button>
+            <button type="button" class="btn-secondary btn-sm" disabled="@_bulkBusy" @onclick="() => SetVisibilityAsync(ItemVisibility.Private)">
+                <span class="icon-[lucide--eye-off] size-3.5"></span> @T["Hide from the website"]
+            </button>
+            <button type="button" class="btn-ghost btn-sm" @onclick="() => _selected.Clear()">@T["Clear selection"]</button>
+        </div>
+    }
+    else if (_bulkError is not null)
+    {
+        <div class="flex items-center gap-2 border-b border-red-200/70 bg-red-50/70 px-4 py-2.5 text-sm font-medium text-red-800" role="alert">
+            <span class="icon-[lucide--circle-alert] size-4"></span> @_bulkError
+        </div>
+    }
+    else if (_bulkNotice is not null)
+    {
+        <div class="flex items-center gap-2 border-b border-emerald-200/70 bg-emerald-50/70 px-4 py-2.5 text-sm font-medium text-emerald-800" role="status">
+            <span class="icon-[lucide--circle-check] size-4"></span> @_bulkNotice
+        </div>
+    }
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="text-left text-xs font-medium text-stone-500">
+                <tr class="border-b border-stone-100">
+                    <th class="w-10 py-3 pl-4">
+                        <input type="checkbox" class="form-checkbox" aria-label="@T["Select all on the page"]"
+                               checked="@(PageRows.Any() && PageRows.All(r => _selected.Contains(r.Id)))" @onchange="ToggleAllOnPage" />
+                    </th>
+                    <th class="w-20 py-3 pr-2 pl-2"><span class="sr-only">@T["Photo"]</span></th>
+                    <SortHeader Title="@T["Name"]" Column="SortColumn.Name" Current="_state.Sort" Descending="_state.SortDescending" OnSort="SortBy" />
+                    <SortHeader Title="@T["Type"]" Column="SortColumn.Type" Current="_state.Sort" Descending="_state.SortDescending" OnSort="SortBy" CssClass="hidden md:table-cell" />
+                    <SortHeader Title="@T["Country"]" Column="SortColumn.Country" Current="_state.Sort" Descending="_state.SortDescending" OnSort="SortBy" CssClass="hidden lg:table-cell" />
+                    <SortHeader Title="@T["Period"]" Column="SortColumn.Year" Current="_state.Sort" Descending="_state.SortDescending" OnSort="SortBy" CssClass="hidden xl:table-cell" />
+                    <SortHeader Title="@T["Purchase"]" Column="SortColumn.PurchasePrice" Current="_state.Sort" Descending="_state.SortDescending" OnSort="SortBy" AlignRight="true" CssClass="hidden sm:table-cell" />
+                    <SortHeader Title="@T["Estimate"]" Column="SortColumn.EstimatedValue" Current="_state.Sort" Descending="_state.SortDescending" OnSort="SortBy" AlignRight="true" CssClass="hidden sm:table-cell" />
+                    <th class="w-10 py-3 pr-4"><span class="sr-only">@T["Detail"]</span></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-100">
+                @foreach (var row in PageRows)
+                {
+                    <ItemTableRow @key="row.Id" Row="row" Selected="_selected.Contains(row.Id)"
+                                  OnToggle="() => ToggleRow(row.Id)" OnOpen="() => ListNav.OpenFromListAsync(AdminUrls.Item(row.Id))" />
+                }
+            </tbody>
+        </table>
+
+        @if (_rows.Count == 0)
+        {
+            <div class="flex flex-col items-center px-4 py-16 text-center">
+                <span class="icon-[lucide--search-x] size-10 text-stone-400"></span>
+                <p class="mt-3 font-medium text-stone-900">@T["Nothing found"]</p>
+                <p class="mt-1 text-sm text-stone-500">@T["Try changing the search or the filters."]</p>
+            </div>
+        }
+    </div>
+
+    <Pager Page="_page" PageSize="PageSize" Total="_rows.Count" OnPage="UpdateUrl" />
+</div>
+
+@code {
+    private const int PageSize = 50;
+
+    private EditorLookups? _lookups;
+    private List<AdminItemRow> _rows = [];
+    private readonly ItemListState _state = new();
+    private int _page;
+
+    // Bulk actions on the selected rows.
+    private readonly HashSet<int> _selected = [];
+    private bool _bulkBusy;
+    private string? _bulkNotice;
+    private string? _bulkError;
+
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Search)] public string? QuerySearch { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Type)] public string? QueryType { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Country)] public string? QueryCountry { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Category)] public string? QueryCategory { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Visibility)] public string? QueryVisibility { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Sold)] public string? QuerySold { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Images)] public string? QueryImages { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Sort)] public string? QuerySort { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Direction)] public string? QueryDirection { get; set; }
+    [SupplyParameterFromQuery(Name = ItemListState.Keys.Page)] public string? QueryPage { get; set; }
+
+    private string? _loadedFilter;
+    private bool _searchDirty;
+    private CancellationTokenSource? _searchDebounce;
+    private int _loadVersion;
+
+    private int PageCount => (_rows.Count + PageSize - 1) / PageSize;
+
+    private IEnumerable<AdminItemRow> PageRows => _state.Apply(_rows).Skip(_page * PageSize).Take(PageSize);
+
+    protected override async Task OnInitializedAsync() => _lookups = await Editor.GetLookupsAsync();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // A search being typed wins – the URL is updated with a delay and could overwrite it with an older value.
+        _state.ReadFrom(key => key switch
+        {
+            ItemListState.Keys.Search => QuerySearch,
+            ItemListState.Keys.Type => QueryType,
+            ItemListState.Keys.Country => QueryCountry,
+            ItemListState.Keys.Category => QueryCategory,
+            ItemListState.Keys.Visibility => QueryVisibility,
+            ItemListState.Keys.Sold => QuerySold,
+            ItemListState.Keys.Images => QueryImages,
+            ItemListState.Keys.Sort => QuerySort,
+            ItemListState.Keys.Direction => QueryDirection,
+            _ => null,
+        }, includeSearch: !_searchDirty);
+
+        if (_state.FilterKey != _loadedFilter)
+        {
+            await LoadRowsAsync();
+            _loadedFilter = _state.FilterKey;
+        }
+
+        _page = Math.Clamp((QueryValue.Int(QueryPage) ?? 1) - 1, 0, Math.Max(0, PageCount - 1));
+    }
+
+    private async Task LoadRowsAsync()
+    {
+        // While typing fast, queries run concurrently – an older result finishing late must not overwrite a newer one.
+        var version = ++_loadVersion;
+        var rows = await Query.GetItemsAsync(_state.ToFilter());
+        if (version != _loadVersion)
+        {
+            return;
+        }
+        _rows = rows;
+        // The selection keeps only rows still visible after a filter change.
+        _selected.IntersectWith(_rows.Select(r => r.Id));
+    }
+
+    private void ToggleRow(int id)
+    {
+        _bulkNotice = null;
+        if (!_selected.Remove(id))
+        {
+            _selected.Add(id);
+        }
+    }
+
+    private void ToggleAllOnPage()
+    {
+        _bulkNotice = null;
+        var ids = PageRows.Select(r => r.Id).ToList();
+        if (ids.All(_selected.Contains))
+        {
+            _selected.ExceptWith(ids);
+        }
+        else
+        {
+            _selected.UnionWith(ids);
+        }
+    }
+
+    private async Task SetVisibilityAsync(ItemVisibility visibility)
+    {
+        _bulkBusy = true;
+        _bulkError = null;
+        try
+        {
+            var changed = 0;
+            if (!await SafeAction.RunAsync(Logger, "bulk visibility change", async () => changed = await Editor.SetVisibilityAsync(_selected.ToList(), visibility)))
+            {
+                _selected.Clear();
+                _bulkNotice = null;
+                _bulkError = T[SafeAction.Message];
+                return;
+            }
+            _selected.Clear();
+            await LoadRowsAsync();
+            var count = T.Plural("{0} item|{0} items", changed);
+            _bulkNotice = visibility == ItemVisibility.Public ? T["Published: {0}.", count] : T["Hidden from the website: {0}.", count];
+        }
+        finally
+        {
+            _bulkBusy = false;
+        }
+    }
+
+    /// <summary>The search filters immediately; it is written to the URL only after a short pause in typing.</summary>
+    private async Task SearchChangedAsync()
+    {
+        _searchDirty = true;
+        _page = 0;
+        await LoadRowsAsync();
+        _loadedFilter = null;
+
+        _searchDebounce?.Cancel();
+        _searchDebounce = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(400, _searchDebounce.Token);
+            _searchDirty = false;
+            UpdateUrl();
+        }
+        catch (TaskCanceledException)
+        {
+            // The user keeps typing – only the last change updates the URL.
+        }
+    }
+
+    private void SortBy(SortColumn column)
+    {
+        _state.SortBy(column);
+        UpdateUrl();
+    }
+
+    /// <summary>Writes the state to the URL (a filter change returns to the first page); loading happens in OnParametersSetAsync.</summary>
+    private void UpdateUrl(int page = 0) =>
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameters(_state.ToQuery(page)), replace: true);
+
+    // Cancel a pending debounce – it would otherwise still rewrite the URL after leaving the page.
+    public void Dispose()
+    {
+        _searchDebounce?.Cancel();
+        _searchDebounce?.Dispose();
+    }
+}

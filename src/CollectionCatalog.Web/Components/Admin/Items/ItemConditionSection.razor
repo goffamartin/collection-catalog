@@ -1,0 +1,33 @@
+@* Condition, originality and accessories. Part of the item editor form (EditContext comes from the EditForm). *@
+<section class="card">
+    <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--shield-check] size-4 text-amber-600"></span> @T["Condition and accessories"]</h2></div>
+    <div class="card-body grid gap-5 sm:grid-cols-2">
+        <div>
+            <label for="condition" class="form-label">@T["Condition"]</label>
+            <InputSelect id="condition" @bind-Value="Model.Condition" class="form-input">
+                @foreach (var condition in Enum.GetValues<ConditionState>())
+                {
+                    <option value="@condition">@condition.Label()</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label for="originality" class="form-label">@T["Originality"]</label>
+            <InputSelect id="originality" @bind-Value="Model.Originality" class="form-input">
+                @foreach (var originality in Enum.GetValues<Originality>())
+                {
+                    <option value="@originality">@originality.Label()</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="flex flex-wrap gap-x-6 gap-y-3 sm:col-span-2">
+            <label class="flex items-center gap-2 text-sm text-stone-700"><InputCheckbox @bind-Value="Model.HasBox" class="form-checkbox" /> @T["Original box / case"]</label>
+            <label class="flex items-center gap-2 text-sm text-stone-700"><InputCheckbox @bind-Value="Model.HasCertificate" class="form-checkbox" /> @T["Certificate / label"]</label>
+            <label class="flex items-center gap-2 text-sm text-stone-700"><InputCheckbox @bind-Value="Model.HasDocumentation" class="form-checkbox" /> @T["Documentation"]</label>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ItemEditModel Model { get; set; } = null!;
+}

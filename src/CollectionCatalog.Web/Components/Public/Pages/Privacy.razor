@@ -1,0 +1,70 @@
+@page "/ochrana-osobnich-udaju"
+@inject SiteSettingsService SiteSettings
+
+@if (_site is null)
+{
+    return;
+}
+
+<Seo Title="@T["Privacy policy"]" Path="ochrana-osobnich-udaju" Description="@T["How we process personal data from the forms on the website."]" />
+
+<div class="site-container max-w-3xl pt-10 sm:pt-14">
+    <p class="eyebrow">@_site.SiteName</p>
+    <h1 class="display-title mt-3 text-4xl sm:text-5xl">@T["Privacy policy"]</h1>
+    <div class="gold-rule mt-6"></div>
+
+    <div class="mt-8 space-y-8 leading-relaxed text-stone-700 [&_h2]:font-display [&_h2]:text-xl [&_h2]:font-medium [&_h2]:text-stone-900 [&_li]:ml-5 [&_li]:list-disc [&_p]:mt-2 [&_ul]:mt-2 [&_ul]:space-y-1">
+        <section>
+            <h2>@T["Who processes the data"]</h2>
+            <p>
+                @T["The controller of personal data is the operator of the website {0} (a private person).", _site.SiteName]
+                @if (_site.ContactEmail is { } email)
+                {
+                    <span>@T["You can contact us at"] <a href="@($"mailto:{email}")" class="text-link">@email</a> @T["or via the"] <a href="kontakt" class="text-link">@T["contact form"]</a>.</span>
+                }
+                else
+                {
+                    <span>@T["You can contact us via the"] <a href="kontakt" class="text-link">@T["contact form"]</a>.</span>
+                }
+            </p>
+        </section>
+
+        <section>
+            <h2>@T["What data and why"]</h2>
+            <p>@T["When you send us a question or a reply to an offer, we store:"]</p>
+            <ul>
+                <li>@T["your name, e-mail and optionally phone,"]</li>
+                <li>@T["the text of the message, optionally a proposed price,"]</li>
+                <li>@T["which piece or offer the message refers to and when you sent it."]</li>
+            </ul>
+            <p>@T["We use the data only to reply to you and possibly arrange a sale or exchange. We do not share it with anyone or use it for marketing."]</p>
+        </section>
+
+        <section>
+            <h2>@T["Legal basis and retention"]</h2>
+            <p>
+                @T["We process the data based on your consent, which you give by sending the form. Handled messages are deleted automatically after 12 months, earlier at your request."]
+            </p>
+        </section>
+
+        <section>
+            <h2>@T["Your rights"]</h2>
+            <p>
+                @T["You have the right to access your data, have it corrected or erased, restrict its processing, and withdraw your consent at any time – just write to us. If you believe we process the data in breach of the law, you can turn to the Office for Personal Data Protection (uoou.gov.cz)."]
+            </p>
+        </section>
+
+        <section>
+            <h2>@T["Cookies and analytics"]</h2>
+            <p>
+                @T["The website uses only one technically necessary cookie, which protects the forms from abuse (protection against request forgery). It contains no personal data and is deleted when the browser closes. The website uses no tracking, analytics or advertising cookies, so we do not ask for your cookie consent."]
+            </p>
+        </section>
+    </div>
+</div>
+
+@code {
+    private SiteInfo? _site;
+
+    protected override async Task OnInitializedAsync() => _site = await SiteSettings.GetAsync();
+}

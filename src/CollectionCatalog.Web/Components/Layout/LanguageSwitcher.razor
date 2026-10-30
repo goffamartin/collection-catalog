@@ -1,0 +1,60 @@
+@inject LanguageService Languages
+@inject NavigationManager Navigation
+
+@* Links to the same page in the other languages. Full page load (data-enhance-nav="false"): the language is part of
+   <base href> and of the interactive circuit, so switching must start fresh. A wrong item slug in the other language
+   is fine – the detail page redirects to the canonical URL. Hidden with a single language.
+   The current language with a globe opening a list (native <details>, works without the interactive circuit;
+   site.js closes it on a click outside or on Escape). *@
+@if (Languages.All.Count > 1)
+{
+    <details class="@($"relative {CssClass}")" data-dropdown>
+        <summary class="@($"flex cursor-pointer list-none items-center gap-1.5 rounded-md px-2 py-1 text-xs font-semibold tracking-wide uppercase transition [&::-webkit-details-marker]:hidden {Theme.Link}")"
+                 aria-label="@T["Language: {0}", Languages.All.First(l => l.Code == Languages.Current.Code).Name]">
+            <span class="icon-[lucide--globe] size-4"></span>
+            @Languages.Current.Code
+            <span class="icon-[lucide--chevron-down] size-3 opacity-60"></span>
+        </summary>
+        <nav class="@($"absolute z-40 w-48 rounded-xl p-1.5 shadow-xl ring-1 {(OpenUp ? "bottom-full mb-2" : "top-full mt-2")} {(AlignLeft ? "left-0" : "right-0")} {Theme.Panel}")"
+             aria-label="@T["Language"]">
+            @foreach (var language in Languages.All)
+            {
+                var current = language.Code == Languages.Current.Code;
+                <a href="@UrlIn(language)" hreflang="@language.Code" lang="@language.Code" aria-current="@(current ? "true" : null)" data-enhance-nav="false"
+                   class="@($"flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition {(current ? Theme.Active : Theme.Link)}")">
+                    <span class="w-6 text-xs font-semibold uppercase opacity-60">@language.Code</span>
+                    <span class="flex-1">@language.Name</span>
+                    @if (current)
+                    {
+                        <span class="icon-[lucide--check] size-4"></span>
+                    }
+                </a>
+            }
+        </nav>
+    </details>
+}
+
+@code {
+    private static readonly (string Link, string Active, string Panel) _light =
+        ("text-stone-500 hover:bg-stone-900/5 hover:text-stone-900", "bg-stone-900/5 font-medium text-stone-900", "bg-white ring-stone-200");
+    private static readonly (string Link, string Active, string Panel) _dark =
+        ("text-stone-400 hover:bg-white/5 hover:text-white", "bg-white/10 font-medium text-white", "bg-stone-900 ring-white/10");
+
+    [Parameter] public string? CssClass { get; set; }
+
+    /// <summary>On a dark background (administration).</summary>
+    [Parameter] public bool Dark { get; set; }
+
+
+    /// <summary>The list opens upwards (switcher at the bottom of the screen).</summary>
+    [Parameter] public bool OpenUp { get; set; }
+
+    /// <summary>The list aligns to the left edge of the switcher (default: right edge).</summary>
+    [Parameter] public bool AlignLeft { get; set; }
+
+    private (string Link, string Active, string Panel) Theme => Dark ? _dark : _light;
+
+    /// <summary>Absolute path of the current page in a language (ignores &lt;base href&gt;, which carries the current language).</summary>
+    private string UrlIn(LanguageInfo language) =>
+        "/" + Languages.PathPrefix(language.Code) + Navigation.ToBaseRelativePath(Navigation.Uri);
+}

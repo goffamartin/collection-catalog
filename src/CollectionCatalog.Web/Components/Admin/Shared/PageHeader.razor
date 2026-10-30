@@ -1,0 +1,50 @@
+@* Header of an administration page: title, description and actions on the right. *@
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div class="min-w-0">
+        @if (OnBack.HasDelegate)
+        {
+            @* A button, not a link: Blazor would intercept a click on <a href> as navigation before preventDefault applies. *@
+            <button type="button" class="@BackClass" @onclick="() => OnBack.InvokeAsync()">
+                <span class="icon-[lucide--arrow-left] size-4"></span> @(BackText ?? T["Back"])
+            </button>
+        }
+        else if (BackHref is not null)
+        {
+            <a href="@BackHref" class="@BackClass">
+                <span class="icon-[lucide--arrow-left] size-4"></span> @(BackText ?? T["Back"])
+            </a>
+        }
+        <h1 class="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">@Title</h1>
+        @if (Description is not null)
+        {
+            <div class="mt-1 text-sm text-stone-500">@Description</div>
+        }
+    </div>
+    @if (Actions is not null)
+    {
+        <div class="flex flex-wrap items-center gap-2">@Actions</div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? Description { get; set; }
+
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+
+    [Parameter]
+    public string? BackHref { get; set; }
+
+    [Parameter]
+    public string? BackText { get; set; }
+
+    /// <summary>Custom "back" handling (e.g. a step in the browser history) – takes precedence over <see cref="BackHref"/>.</summary>
+    [Parameter]
+    public EventCallback OnBack { get; set; }
+
+    private const string BackClass = "mb-2 inline-flex cursor-pointer items-center gap-1 text-sm text-stone-500 transition hover:text-stone-900";
+}

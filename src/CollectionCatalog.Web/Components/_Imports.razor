@@ -1,0 +1,28 @@
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using CollectionCatalog.Web
+@using CollectionCatalog.Web.Components
+@using CollectionCatalog.Web.Components.Account.Shared
+@using CollectionCatalog.Web.Components.Layout
+@using CollectionCatalog.Web.Domain
+@using CollectionCatalog.Web.Infrastructure
+@using CollectionCatalog.Web.Services.Public
+@using CollectionCatalog.Web.Services.Site
+@using CollectionCatalog.Web.Components.Public.Shared
+@using CollectionCatalog.Web.Services.Inquiries
+@using CollectionCatalog.Web.Services.Listings
+@using CollectionCatalog.Web.Services.Text
+@using Microsoft.Extensions.Localization
+@using CollectionCatalog.Web.Resources
+@using CollectionCatalog.Web.Services.Languages
+@* UI texts: T["English text"] – translations in Resources/AppText.{culture}.resx. *@
+@inject IStringLocalizer<AppText> T
+@using CollectionCatalog.Web.Components.Shared

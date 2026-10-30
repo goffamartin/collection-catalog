@@ -1,0 +1,29 @@
+@* Breadcrumbs – visible (an <ol> list) and for search engines (BreadcrumbList) from one source.
+   The last item (without a path) is the current page. *@
+<nav aria-label="@T["Breadcrumbs"]">
+    <ol class="flex flex-wrap items-center gap-1.5 text-sm text-stone-500">
+        @for (var i = 0; i < Items.Count; i++)
+        {
+            var (name, path) = Items[i];
+            <li class="@($"flex min-w-0 items-center gap-1.5 {(path is null ? "flex-1" : "")}")">
+                @if (i > 0)
+                {
+                    <span class="icon-[lucide--chevron-right] size-3.5 shrink-0 text-stone-300" aria-hidden="true"></span>
+                }
+                @if (path is null)
+                {
+                    <span class="truncate text-stone-700" aria-current="page">@name</span>
+                }
+                else
+                {
+                    <a href="@path" class="whitespace-nowrap hover:text-stone-900">@name</a>
+                }
+            </li>
+        }
+    </ol>
+</nav>
+<JsonLd Data="StructuredData.Breadcrumbs(Items.ToArray())" />
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<(string Name, string? Path)> Items { get; set; } = [];
+}

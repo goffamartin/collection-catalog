@@ -1,0 +1,22 @@
+@* Offer card: the item card with price and status. *@
+<ItemCard Item="Offer.Item" Href="@Offer.Url">
+    <Badge>
+        @if (Offer.Status == ListingStatus.Reserved)
+        {
+            <span class="badge absolute top-2.5 right-2.5 bg-amber-100 text-amber-900 shadow-xs ring-1 ring-amber-300">@T["Reserved"]</span>
+        }
+    </Badge>
+    <Footer>
+        <p class="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-sm">
+            <span class="font-semibold text-stone-900">@PublicUrls.Price(Offer.AskingPrice)</span>
+            @if (Offer.OpenToTrade)
+            {
+                <span class="text-xs text-stone-500">· @AppText.In("inline", "exchange possible")</span>
+            }
+        </p>
+    </Footer>
+</ItemCard>
+
+@code {
+    [Parameter, EditorRequired] public PublicOfferCard Offer { get; set; } = null!;
+}

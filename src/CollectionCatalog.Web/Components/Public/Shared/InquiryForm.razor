@@ -1,0 +1,159 @@
+@using System.Web
+@inject InquiryService Inquiries
+@inject InquiryRateLimiter RateLimiter
+@inject NavigationManager Navigation
+
+@* Form of a question / reply to an offer (static SSR, POST + redirect). Spam protection: the hidden field
+   "Website" (bots fill it in) and a limit of messages from one IP address. *@
+<section id="dotaz" class="@($"scroll-mt-24 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-stone-200/80 sm:p-6 {CssClass}")">
+    @if (_sent)
+    {
+        <div class="flex gap-4">
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                <span class="icon-[lucide--check] size-5"></span>
+            </span>
+            <div>
+                <p class="font-display text-lg font-medium">@T["Thank you, the message has been sent"]</p>
+                <p class="mt-1 text-sm text-stone-600">@T["We will get back to you by e-mail, usually within a few days."]</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <h2 class="font-display text-xl font-medium">@(Title ?? T["Write to us"])</h2>
+        @if (Description is not null)
+        {
+            <p class="mt-1 text-sm text-stone-500">@Description</p>
+        }
+
+        @if (_error is not null)
+        {
+            <p class="mt-4 flex gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800 ring-1 ring-red-200">
+                <span class="icon-[lucide--circle-alert] mt-0.5 size-4 shrink-0"></span> @_error
+            </p>
+        }
+
+        <EditForm Model="Form" FormName="inquiry" method="post" OnValidSubmit="SubmitAsync" Enhance class="mt-5 grid gap-4 sm:grid-cols-2">
+            <LocalizedValidator />
+
+            <div>
+                <label for="inquiry-name" class="form-label">@AppText.In("person", "Name")</label>
+                <InputText id="inquiry-name" @bind-Value="Form.Name" autocomplete="name" class="form-input" />
+                <ValidationMessage For="() => Form.Name" />
+            </div>
+            <div>
+                <label for="inquiry-email" class="form-label">@T["E-mail"]</label>
+                <InputText id="inquiry-email" type="email" @bind-Value="Form.Email" autocomplete="email" class="form-input" />
+                <ValidationMessage For="() => Form.Email" />
+            </div>
+            <div class="@(AcceptsOffers ? "" : "sm:col-span-2")">
+                <label for="inquiry-phone" class="form-label">@T["Phone"] <span class="font-normal text-stone-500">@T["(optional)"]</span></label>
+                <InputText id="inquiry-phone" type="tel" @bind-Value="Form.Phone" autocomplete="tel" class="form-input" />
+                <ValidationMessage For="() => Form.Phone" />
+            </div>
+            @if (AcceptsOffers)
+            {
+                <div>
+                    <label for="inquiry-price" class="form-label">@T["Your price offer"] <span class="font-normal text-stone-500">@T["(optional)"]</span></label>
+                    <div class="relative">
+                        <InputNumber id="inquiry-price" @bind-Value="Form.OfferedPrice" min="1" step="1" inputmode="numeric" class="form-input pr-10 tabular-nums" />
+                        <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-stone-500">@Money.Symbol</span>
+                    </div>
+                    <ValidationMessage For="() => Form.OfferedPrice" />
+                </div>
+            }
+            <div class="sm:col-span-2">
+                <label for="inquiry-message" class="form-label">@T["Message"]</label>
+                <InputTextArea id="inquiry-message" @bind-Value="Form.Message" rows="5" class="form-input" placeholder="@MessagePlaceholder" />
+                <ValidationMessage For="() => Form.Message" />
+            </div>
+
+            @* Bot trap: people do not see the field, bots fill it in. *@
+            <div class="absolute -left-[10000px] size-px overflow-hidden" aria-hidden="true">
+                <label for="inquiry-website">Web</label>
+                <InputText id="inquiry-website" @bind-Value="Form.Website" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <div class="sm:col-span-2">
+                <label class="flex items-start gap-3 text-sm text-stone-600">
+                    <InputCheckbox @bind-Value="Form.Consent" class="form-checkbox mt-0.5" />
+                    <span>@T["I agree with the"] <a href="ochrana-osobnich-udaju" target="_blank" class="text-link">@T["processing of personal data"]</a> @T["for the purpose of replying to my message."]</span>
+                </label>
+                <ValidationMessage For="() => Form.Consent" />
+            </div>
+
+            <div class="sm:col-span-2">
+                <button type="submit" class="btn w-full rounded-full bg-stone-900 px-6 py-3 text-white hover:bg-stone-800 sm:w-auto">
+                    <span class="icon-[lucide--send] size-4"></span> @(SubmitText ?? T["Send"])
+                </button>
+            </div>
+        </EditForm>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
+
+    // Name = "Form": form fields are named after the expressions in the markup ("Form.Email"), not after this property.
+    [SupplyParameterFromForm(FormName = "inquiry", Name = "Form")]
+    private InquiryInput? Input { get; set; }
+
+    private InquiryInput Form => Input ??= new();
+
+    /// <summary>Piece of the collection the message is about.</summary>
+    [Parameter] public int? ItemId { get; set; }
+
+    /// <summary>Offer the visitor replies to.</summary>
+    [Parameter] public int? ListingId { get; set; }
+
+    /// <summary>Show the field "Your price offer".</summary>
+    [Parameter] public bool AcceptsOffers { get; set; }
+
+    /// <summary>Heading; „Write to us“ by default.</summary>
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Description { get; set; }
+    /// <summary>Text of the submit button; „Send“ by default.</summary>
+    [Parameter] public string? SubmitText { get; set; }
+    [Parameter] public string MessagePlaceholder { get; set; } = "";
+    [Parameter] public string? CssClass { get; set; }
+
+    private bool _sent;
+    private string? _error;
+
+    protected override void OnInitialized()
+    {
+        var query = HttpUtility.ParseQueryString(new Uri(Navigation.Uri).Query);
+        _sent = query["odeslano"] == "1";
+    }
+
+    private async Task SubmitAsync()
+    {
+        // A bot filled in the hidden field – pretend it was sent, but store nothing.
+        if (!string.IsNullOrEmpty(Form.Website))
+        {
+            RedirectToThanks();
+            return;
+        }
+
+        if (!RateLimiter.TryAcquire(HttpContext.Connection.RemoteIpAddress?.ToString()))
+        {
+            _error = T["You have sent too many messages in a short time. Please try again later."];
+            return;
+        }
+
+        if (!await Inquiries.SubmitAsync(Form, ItemId, ListingId))
+        {
+            _error = T["Unfortunately, this piece is no longer available."];
+            return;
+        }
+
+        RedirectToThanks();
+    }
+
+    /// <summary>Post/Redirect/Get – reloading the page does not send the form again.</summary>
+    private void RedirectToThanks()
+    {
+        var uri = new Uri(Navigation.Uri);
+        Navigation.NavigateTo($"{uri.GetLeftPart(UriPartial.Path)}?odeslano=1#dotaz");
+    }
+}

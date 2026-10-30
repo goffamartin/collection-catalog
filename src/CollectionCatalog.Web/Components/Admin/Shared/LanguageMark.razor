@@ -1,0 +1,12 @@
+@inject LanguageService Languages
+
+@* Marks a translatable field in a form label with the language being edited (only with more languages). *@
+@if (Languages.All.Count > 1)
+{
+    <span class="ml-1.5 rounded bg-sky-50 px-1 py-px align-[1px] text-[10px] font-semibold tracking-wide text-sky-700 uppercase ring-1 ring-sky-600/20"
+          title="@T["Translatable – edited in the selected language"]">@Code</span>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Code { get; set; } = "";
+}

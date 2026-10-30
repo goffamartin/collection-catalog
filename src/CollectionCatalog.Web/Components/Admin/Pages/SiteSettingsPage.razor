@@ -1,0 +1,159 @@
+@page "/admin/nastaveni"
+@rendermode InteractiveServer
+@using CollectionCatalog.Web.Services.Site
+@inject SiteSettingsService SiteSettings
+@inject ILogger<SiteSettingsPage> Logger
+
+<PageTitle>@T["Website settings – administration"]</PageTitle>
+
+@if (_model is null)
+{
+    return;
+}
+
+<EditForm EditContext="_editContext" OnValidSubmit="SaveAsync">
+    <LocalizedValidator />
+    <UnsavedChangesGuard HasChanges="() => _dirty" />
+
+    <PageHeader Title="@T["Website settings"]">
+        <Description>@T["Texts and contacts of the public website. Changes take effect right after saving."]</Description>
+        <Actions>
+            <a href="" target="_blank" class="btn-secondary"><span class="icon-[lucide--external-link] size-4"></span> @T["View website"]</a>
+            <button type="submit" class="btn-primary" disabled="@(_saving || !_dirty)"
+                    title="@(_dirty ? null : T["No unsaved changes"].Value)">
+                <span class="icon-[lucide--save] size-4"></span> @T["Save"]
+            </button>
+        </Actions>
+    </PageHeader>
+
+    <EditLanguageTabs @bind-Value="_model.EditLanguage" CssClass="mb-6" />
+
+    @if (_error is not null)
+    {
+        <div class="mb-6 flex gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200" role="alert">
+            <span class="icon-[lucide--circle-alert] mt-0.5 size-4 shrink-0"></span> @_error
+        </div>
+    }
+
+    <div class="grid gap-6 pb-24 xl:grid-cols-5">
+        <div class="space-y-6 xl:col-span-3">
+            <section class="card">
+                <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--house] size-4 text-amber-600"></span> @T["Home page"]</h2></div>
+                <div class="card-body space-y-5">
+                    <div>
+                        <label for="site-name" class="form-label">@T["Website name"]<LanguageMark Code="@_model.EditLanguage" /></label>
+                        <InputText id="site-name" @bind-Value="_model.SiteName" class="form-input" placeholder="@_model.Fallback(_model.SiteNameText)" />
+                        <p class="form-hint">@T["In the header, the footer and the title of the browser tab."]</p>
+                        <ValidationMessage For="() => _model.SiteName" />
+                    </div>
+                    <div>
+                        <label for="headline" class="form-label">@T["Main headline"]<LanguageMark Code="@_model.EditLanguage" /></label>
+                        <InputText id="headline" @bind-Value="_model.Headline" class="form-input" placeholder="@_model.Fallback(_model.HeadlineText)" />
+                        <ValidationMessage For="() => _model.Headline" />
+                    </div>
+                    <div>
+                        <label for="intro" class="form-label">@T["Intro text"]<LanguageMark Code="@_model.EditLanguage" /></label>
+                        <InputTextArea id="intro" @bind-Value="_model.Intro" rows="3" class="form-input" placeholder="@_model.Fallback(_model.IntroText)" />
+                        <p class="form-hint">@T["A short paragraph below the headline; also used as the description of the website in search engines."]</p>
+                        <ValidationMessage For="() => _model.Intro" />
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--book-open] size-4 text-amber-600"></span> @T["About the collection"]<LanguageMark Code="@_model.EditLanguage" /></h2></div>
+                <div class="card-body">
+                    <InputTextArea id="about" aria-label="@T["Text of the About the collection page"]" @bind-Value="_model.About" rows="12" class="form-input" placeholder="@(_model.Fallback(_model.AboutText) ?? T["How the collection came about, what it focuses on…"])" />
+                    <p class="form-hint">@T["Separate paragraphs with an empty line. When left empty, the page shows the intro text."]</p>
+                    <ValidationMessage For="() => _model.About" />
+                </div>
+            </section>
+        </div>
+
+        <div class="space-y-6 xl:col-span-2">
+            <section class="card">
+                <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--mail] size-4 text-amber-600"></span> @T["Contact"]</h2></div>
+                <div class="card-body space-y-5">
+                    <div>
+                        <label for="email" class="form-label">@T["E-mail"]</label>
+                        <InputText id="email" type="email" @bind-Value="_model.ContactEmail" class="form-input" />
+                        <ValidationMessage For="() => _model.ContactEmail" />
+                    </div>
+                    <div>
+                        <label for="phone" class="form-label">@T["Phone"]</label>
+                        <InputText id="phone" type="tel" @bind-Value="_model.ContactPhone" class="form-input" />
+                        <ValidationMessage For="() => _model.ContactPhone" />
+                    </div>
+                    <div>
+                        <label for="contact-note" class="form-label">@T["Text on the contact page"]<LanguageMark Code="@_model.EditLanguage" /></label>
+                        <InputTextArea id="contact-note" @bind-Value="_model.ContactNote" rows="4" class="form-input" placeholder="@_model.Fallback(_model.ContactNoteText)" />
+                        <ValidationMessage For="() => _model.ContactNote" />
+                    </div>
+                    <p class="flex gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-900 ring-1 ring-amber-200">
+                        <span class="icon-[lucide--shield-alert] mt-px size-4 shrink-0"></span>
+                        @T["The contacts will be publicly visible on the website. Do not enter a home address or other sensitive data."]
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <SaveBar Dirty="_dirty" SavedRecently="_savedRecently" Saving="_saving" OnDiscard="DiscardChangesAsync" />
+</EditForm>
+
+@code {
+    private SiteSettingsModel? _model;
+    private EditContext _editContext = null!;
+    private bool _dirty;
+    private bool _saving;
+    private bool _savedRecently;
+    private int _savedNoticeVersion;
+    private string? _error;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _model = await SiteSettings.GetForEditAsync();
+        _dirty = false;
+        _editContext = new EditContext(_model);
+        _editContext.OnFieldChanged += (_, _) =>
+        {
+            _dirty = true;
+            _savedRecently = false;
+        };
+    }
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        try
+        {
+            _error = null;
+            if (!await SafeAction.RunAsync(Logger, "saving website settings", () => SiteSettings.SaveAsync(_model!)))
+            {
+                _error = T[SafeAction.Message];
+                return;
+            }
+            _dirty = false;
+            _savedRecently = true;
+            _ = HideSavedNoticeAsync(++_savedNoticeVersion);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task HideSavedNoticeAsync(int version)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(2.5));
+        if (version == _savedNoticeVersion)
+        {
+            _savedRecently = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private Task DiscardChangesAsync() => LoadAsync();
+}

@@ -1,0 +1,49 @@
+@* Photo in a frame of a uniform aspect ratio: the whole photo (object-contain), the free space filled by its blurred copy.
+   Cards look the same for landscape and portrait photos and nothing is cropped. *@
+<div class="@($"photo-well {CssClass}")">
+    @if (Image is not null)
+    {
+        <img src="@PublicUrls.Image(Image.FileKey, 400)" alt="" aria-hidden="true" loading="@(Priority ? null : "lazy")" data-gallery-blur="@(GalleryMain ? "" : null)"
+             class="absolute inset-0 size-full scale-125 object-cover opacity-70 blur-2xl saturate-150" />
+        <img src="@PublicUrls.Image(Image.FileKey, Size)"
+             srcset="@SrcSet" sizes="@Sizes"
+             width="@Image.Width" height="@Image.Height" alt="@Alt"
+             loading="@(Priority ? null : "lazy")" fetchpriority="@(Priority ? "high" : null)" decoding="async"
+             data-gallery-main="@(GalleryMain ? "" : null)"
+             class="@($"relative size-full object-contain drop-shadow-lg {ImageCssClass}")" />
+    }
+    else
+    {
+        <div class="flex size-full items-center justify-center text-stone-300">
+            <span class="icon-[lucide--gem] size-12"></span>
+        </div>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public PublicImage? Image { get; set; }
+    [Parameter] public string? Alt { get; set; }
+
+    /// <summary>Aspect ratio, rounding… (e.g. "aspect-[4/5] rounded-xl").</summary>
+    [Parameter] public string? CssClass { get; set; }
+    [Parameter] public string? ImageCssClass { get; set; }
+
+    /// <summary>Default variant (400/800/1600); srcset offers the double one too.</summary>
+    [Parameter] public int Size { get; set; } = 400;
+    [Parameter] public string Sizes { get; set; } = "100vw";
+
+    /// <summary>Main photo above the fold – load immediately.</summary>
+    [Parameter] public bool Priority { get; set; }
+
+    /// <summary>Main photo of the detail gallery (switched by site.js).</summary>
+    [Parameter] public bool GalleryMain { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string SrcSet => Size switch
+    {
+        400 => $"{PublicUrls.Image(Image!.FileKey, 400)} 400w, {PublicUrls.Image(Image.FileKey, 800)} 800w",
+        _ => $"{PublicUrls.Image(Image!.FileKey, 800)} 800w, {PublicUrls.Image(Image.FileKey, 1600)} 1600w",
+    };
+}

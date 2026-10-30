@@ -1,0 +1,30 @@
+@* Message passed through IdentityRedirectManager (cookie) or a parameter. Text starting with the (translated) word "Error" is shown as an error. *@
+@if (!string.IsNullOrEmpty(DisplayMessage))
+{
+    var isError = DisplayMessage.StartsWith(T["Error"], StringComparison.Ordinal);
+    <div role="alert" class="@(isError ? "border-red-200 bg-red-50 text-red-800" : "border-green-200 bg-green-50 text-green-800") mb-4 rounded-md border px-3 py-2 text-sm">
+        @DisplayMessage
+    </div>
+}
+
+@code {
+    private string? _messageFromCookie;
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private string? DisplayMessage => Message ?? _messageFromCookie;
+
+    protected override void OnInitialized()
+    {
+        _messageFromCookie = HttpContext.Request.Cookies[IdentityRedirectManager.StatusCookieName];
+
+        if (_messageFromCookie is not null)
+        {
+            HttpContext.Response.Cookies.Delete(IdentityRedirectManager.StatusCookieName);
+        }
+    }
+}

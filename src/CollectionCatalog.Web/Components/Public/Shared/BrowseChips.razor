@@ -1,0 +1,22 @@
+@* Links into the filtered collection (type / country) with item counts. *@
+<div>
+    <h3 class="text-sm font-semibold text-stone-900">@Title</h3>
+    <ul class="mt-4 flex flex-wrap gap-2">
+        @foreach (var option in Options)
+        {
+            <li>
+                <a href="@($"sbirka?{QueryName}={option.Id}")"
+                   class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-stone-700 shadow-xs ring-1 ring-stone-200 transition hover:text-stone-950 hover:ring-amber-400">
+                    @option.Name
+                    <span class="text-xs text-stone-500">@option.Count</span>
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public IReadOnlyList<FacetOption> Options { get; set; } = [];
+    [Parameter, EditorRequired] public string QueryName { get; set; } = "";
+}

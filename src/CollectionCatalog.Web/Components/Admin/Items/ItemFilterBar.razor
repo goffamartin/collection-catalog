@@ -1,0 +1,84 @@
+@* Search and filters above the item list. Changes the given state directly and reports what changed. *@
+<div class="flex flex-col gap-3 border-b border-stone-100 p-4 lg:flex-row lg:items-center">
+    <div class="relative lg:w-80">
+        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone-500">
+            <span class="icon-[lucide--search] size-4"></span>
+        </span>
+        <input type="search" class="form-input pl-9" placeholder="@T["Search name, country, notes, #id…"]" aria-label="@T["Search items"]"
+               @bind="State.Search" @bind:event="oninput" @bind:after="SearchChangedAsync" />
+    </div>
+
+    <div class="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
+        <select class="form-input" @bind="State.TypeId" @bind:after="FilterChangedAsync" aria-label="@T["Type"]">
+            <option value="">@T["Type"]</option>
+            @foreach (var type in Lookups.Types)
+            {
+                <option value="@type.Id">@type.Name</option>
+            }
+        </select>
+
+        <select class="form-input" @bind="State.CountryId" @bind:after="FilterChangedAsync" aria-label="@T["Country"]">
+            <option value="">@T["Country"]</option>
+            @foreach (var country in Lookups.Countries)
+            {
+                <option value="@country.Id">@country.Name</option>
+            }
+        </select>
+
+        <select class="form-input" @bind="State.CategoryId" @bind:after="FilterChangedAsync" aria-label="@T["Category"]">
+            <option value="">@T["Category"]</option>
+            @foreach (var category in Lookups.Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+
+        <select class="form-input" @bind="State.Visibility" @bind:after="FilterChangedAsync" aria-label="@T["Visibility"]">
+            <option value="">@T["Visibility"]</option>
+            @foreach (var visibility in Enum.GetValues<ItemVisibility>())
+            {
+                <option value="@visibility">@visibility.Label()</option>
+            }
+        </select>
+
+        <select class="form-input" @bind="State.Sold" @bind:after="FilterChangedAsync" aria-label="@T["Sale"]">
+            <option value="">@T["Sale"]</option>
+            <option value="@ItemListState.No">@T["In the collection"]</option>
+            <option value="@ItemListState.Yes">@AppText.In("items", "Sold")</option>
+        </select>
+
+        <select class="form-input" @bind="State.HasImages" @bind:after="FilterChangedAsync" aria-label="@T["Photos"]">
+            <option value="">@T["Photos"]</option>
+            <option value="@ItemListState.Yes">@T["With photos"]</option>
+            <option value="@ItemListState.No">@T["Without photos"]</option>
+        </select>
+    </div>
+
+    @if (State.HasFilter)
+    {
+        <button type="button" class="btn-ghost btn-sm" @onclick="ClearAsync">
+            <span class="icon-[lucide--x] size-3.5"></span> @T["Clear"]
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ItemListState State { get; set; } = null!;
+    [Parameter, EditorRequired] public EditorLookups Lookups { get; set; } = null!;
+
+    /// <summary>A select changed (type, country…) or the filters were cleared.</summary>
+    [Parameter] public EventCallback OnFilterChanged { get; set; }
+
+    /// <summary>Every character typed into the search.</summary>
+    [Parameter] public EventCallback OnSearchChanged { get; set; }
+
+    private Task FilterChangedAsync() => OnFilterChanged.InvokeAsync();
+
+    private Task SearchChangedAsync() => OnSearchChanged.InvokeAsync();
+
+    private Task ClearAsync()
+    {
+        State.ClearFilter();
+        return OnFilterChanged.InvokeAsync();
+    }
+}

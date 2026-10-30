@@ -1,0 +1,7 @@
+@page "/admin"
+@inject NavigationManager NavigationManager
+
+@code {
+    // No dashboard yet – the item list is the start page.
+    protected override void OnInitialized() => NavigationManager.NavigateTo(AdminUrls.Items);
+}

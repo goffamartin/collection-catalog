@@ -1,0 +1,18 @@
+@* Select of a filter value with item counts (GET form of the collection). *@
+<label>
+    <span class="sr-only">@Label</span>
+    <select name="@Name" class="form-input rounded-full">
+        <option value="">@Label</option>
+        @foreach (var option in Options)
+        {
+            <option value="@option.Id" selected="@(option.Id == Selected)">@option.Name (@option.Count)</option>
+        }
+    </select>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = "";
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter, EditorRequired] public IReadOnlyList<FacetOption> Options { get; set; } = [];
+    [Parameter] public int? Selected { get; set; }
+}

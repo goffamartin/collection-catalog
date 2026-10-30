@@ -1,0 +1,29 @@
+@* Sale date and price, profit. Part of the item editor form (EditContext comes from the EditForm). *@
+<section class="card">
+    <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--hand-coins] size-4 text-amber-600"></span> @T["Sale"]</h2></div>
+    <div class="card-body grid gap-5 sm:grid-cols-2">
+        <div>
+            <label for="sale-date" class="form-label">@T["Sale date"]</label>
+            <InputDate id="sale-date" @bind-Value="Model.SaleDate" class="form-input" />
+            <ValidationMessage For="() => Model.SaleDate" />
+        </div>
+        <div>
+            <label for="sale-price" class="form-label">@T["Sale price"]</label>
+            <MoneyInput Id="sale-price" @bind-Value="Model.SalePrice" />
+            <ValidationMessage For="() => Model.SalePrice" />
+        </div>
+        @if (Profit is { } profit)
+        {
+            <p class="text-sm sm:col-span-2 @(profit >= 0 ? "text-emerald-700" : "text-red-700")">
+                <span class="icon-[lucide--trending-up] size-4 align-[-3px]"></span>
+                @T["Profit from the sale:"] <span class="font-semibold">@Format.Money(profit)</span>
+            </p>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ItemEditModel Model { get; set; } = null!;
+
+    private decimal? Profit => Model.SalePrice is { } sale && Model.PurchasePrice is { } purchase ? sale - purchase : null;
+}

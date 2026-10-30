@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/App_Data/
+**/.vs/
+**/.vscode/
+**/*.user
+.git/
+.github/
+tests/
+docs/
+old-data/
+**/node_modules/
+src/CollectionCatalog.Web/wwwroot/css/

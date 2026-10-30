@@ -1,0 +1,39 @@
+@* Purchase, estimate and notes – never published. Part of the item editor form (EditContext comes from the EditForm). *@
+<section class="card ring-amber-200/70">
+    <div class="card-header bg-amber-50/50">
+        <h2 class="card-title"><span class="icon-[lucide--lock] size-4 text-amber-600"></span> @T["Private details"]</h2>
+        <span class="text-xs text-amber-700">@T["Never published"]</span>
+    </div>
+    <div class="card-body grid gap-5 sm:grid-cols-2">
+        <div>
+            <label for="purchase-date" class="form-label">@T["Purchase date"]</label>
+            <InputDate id="purchase-date" @bind-Value="Model.PurchaseDate" class="form-input" />
+        </div>
+        <div>
+            <label for="purchase-price" class="form-label">@T["Purchase price"]</label>
+            <MoneyInput Id="purchase-price" @bind-Value="Model.PurchasePrice" />
+            <ValidationMessage For="() => Model.PurchasePrice" />
+        </div>
+        <div>
+            <label for="seller" class="form-label">@T["Seller / source"]</label>
+            <InputText id="seller" @bind-Value="Model.Seller" class="form-input" placeholder="@T["auction, fair, collector…"]" />
+        </div>
+        <div>
+            <label for="estimated" class="form-label">@T["Estimated value"]</label>
+            <MoneyInput Id="estimated" @bind-Value="Model.EstimatedValue" />
+            <ValidationMessage For="() => Model.EstimatedValue" />
+        </div>
+        <div class="sm:col-span-2">
+            <label for="provenance" class="form-label">@T["Provenance"]</label>
+            <InputTextArea id="provenance" @bind-Value="Model.Provenance" rows="2" class="form-input" placeholder="@T["Origin, previous owners…"]" />
+        </div>
+        <div class="sm:col-span-2">
+            <label for="private-notes" class="form-label">@T["Notes"]</label>
+            <InputTextArea id="private-notes" @bind-Value="Model.PrivateNotes" rows="4" class="form-input" />
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ItemEditModel Model { get; set; } = null!;
+}

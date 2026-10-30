@@ -1,0 +1,141 @@
+@page "/"
+@inject PublicItemQuery Query
+@inject SiteSettingsService SiteSettings
+
+@* Render nothing until loaded (the first render pass happens during await). *@
+@if (_home is null)
+{
+    return;
+}
+
+<Seo ImageKey="@_home.Hero?.Image?.FileKey" />
+<JsonLd Data="StructuredData.WebSite(_site)" />
+
+<section class="site-container grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24">
+    <div>
+        <p class="eyebrow">@T["Private collection"]</p>
+        <h1 class="display-title mt-4 text-4xl leading-[1.08] sm:text-5xl lg:text-6xl">@_site.Headline</h1>
+        <div class="gold-rule mt-7"></div>
+        @if (_site.Intro is not null)
+        {
+            <p class="mt-7 max-w-xl text-lg leading-relaxed text-stone-600">@_site.Intro</p>
+        }
+
+        @if (_home.TotalCount > 0)
+        {
+            <div class="mt-9 flex flex-wrap gap-3">
+                <a href="sbirka" class="btn rounded-full bg-stone-900 px-6 py-3 text-white shadow-sm hover:bg-stone-800">
+                    @T["Browse the collection"] <span class="icon-[lucide--arrow-right] size-4"></span>
+                </a>
+                <a href="o-sbirce" class="btn rounded-full px-6 py-3 text-stone-700 ring-1 ring-stone-300 ring-inset hover:bg-white">@T["About the collection"]</a>
+            </div>
+
+            <dl class="mt-12 flex max-w-lg divide-x divide-stone-200 border-y border-stone-200 py-5">
+                <div class="pr-6">
+                    <dt class="text-xs tracking-wide text-stone-500 uppercase">@T.Plural("Item|Items", _home.TotalCount)</dt>
+                    <dd class="mt-1 font-display text-2xl font-medium sm:text-3xl">@_home.TotalCount</dd>
+                </div>
+                <div class="px-6">
+                    <dt class="text-xs tracking-wide text-stone-500 uppercase">@T.Plural("Country|Countries", _home.CountryCount)</dt>
+                    <dd class="mt-1 font-display text-2xl font-medium sm:text-3xl">@_home.CountryCount</dd>
+                </div>
+                @if (PublicUrls.FormatYears(_home.YearFrom, _home.YearTo) is { } period)
+                {
+                    <div class="pl-6">
+                        <dt class="text-xs tracking-wide text-stone-500 uppercase">@T["Period"]</dt>
+                        <dd class="mt-1 font-display text-2xl font-medium whitespace-nowrap sm:text-3xl">@period</dd>
+                    </div>
+                }
+            </dl>
+        }
+        else
+        {
+            <p class="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-stone-600 ring-1 ring-stone-200">
+                <span class="icon-[lucide--hourglass] size-4 text-amber-700"></span> @T["The collection is being prepared – the first pieces will appear here soon."]
+            </p>
+        }
+    </div>
+
+    @if (_home.Hero is { Image: { } heroImage } hero)
+    {
+        <figure class="relative">
+            <div class="absolute -inset-3 -z-10 rounded-[2rem] bg-gradient-to-br from-amber-100/70 via-transparent to-stone-200/60 blur-2xl"></div>
+            <a href="@hero.Url" class="group block">
+                <PhotoFrame Image="heroImage" Alt="@hero.Name" Size="800" Sizes="(min-width: 1024px) 34rem, 100vw" Priority
+                            CssClass="aspect-[4/5] rounded-[1.75rem] shadow-xl shadow-stone-900/10 ring-1 ring-stone-200/80 sm:aspect-square"
+                            ImageCssClass="p-6 transition duration-700 group-hover:scale-[1.03] sm:p-10" />
+            </a>
+            <figcaption class="mt-4 flex items-baseline justify-between gap-4 px-1 text-sm">
+                <a href="@hero.Url" class="font-display text-base font-medium text-stone-800 hover:text-amber-800">@hero.Name</a>
+                <span class="shrink-0 text-stone-500">@string.Join(" · ", new[] { hero.CountryName, hero.Years }.Where(s => s is not null))</span>
+            </figcaption>
+        </figure>
+    }
+</section>
+
+@if (_home.Featured.Count > 0)
+{
+    <section class="border-y border-stone-200/70 bg-white/55 py-16 sm:py-20">
+        <div class="site-container">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p class="eyebrow">@T["From the collection"]</p>
+                    <h2 class="display-title mt-3 text-3xl sm:text-4xl">@T["Selected pieces"]</h2>
+                </div>
+                <a href="sbirka" class="text-link inline-flex items-center gap-1.5 text-sm">
+                    @T["Whole collection"] <span class="icon-[lucide--arrow-right] size-4"></span>
+                </a>
+            </div>
+            <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
+                @foreach (var item in _home.Featured)
+                {
+                    <ItemCard Item="item" />
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@if (_home.Offers.Count > 0)
+{
+    <section class="site-container py-16 sm:py-20">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p class="eyebrow">@T["For sale and exchange"]</p>
+                <h2 class="display-title mt-3 text-3xl sm:text-4xl">@T["From the offer"]</h2>
+            </div>
+            <a href="nabidka" class="text-link inline-flex items-center gap-1.5 text-sm">
+                @T["Whole offer ({0})", _home.OfferCount] <span class="icon-[lucide--arrow-right] size-4"></span>
+            </a>
+        </div>
+        <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
+            @foreach (var offer in _home.Offers)
+            {
+                <OfferCard Offer="offer" />
+            }
+        </div>
+    </section>
+}
+
+@if (_home.Types.Count > 0 || _home.Countries.Count > 0)
+{
+    <section class="@($"site-container py-16 sm:py-20 {(_home.Offers.Count > 0 ? "border-t border-stone-200/70" : "")}")">
+        <p class="eyebrow">@T["Browse"]</p>
+        <h2 class="display-title mt-3 text-3xl sm:text-4xl">@T["By type and country"]</h2>
+        <div class="mt-10 grid gap-10 lg:grid-cols-2">
+            <BrowseChips Title="@T["Item types"]" Options="_home.Types" QueryName="typ" />
+            <BrowseChips Title="@T["Countries"]" Options="_home.Countries" QueryName="zeme" />
+        </div>
+    </section>
+}
+
+@code {
+    private PublicHome _home = null!;
+    private SiteInfo _site = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _site = await SiteSettings.GetAsync();
+        _home = await Query.GetHomeAsync();
+    }
+}

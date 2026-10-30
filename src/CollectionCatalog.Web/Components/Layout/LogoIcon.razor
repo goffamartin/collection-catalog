@@ -1,0 +1,11 @@
+@* Emblem of the website – a gold gem in a dark circle. Same as the favicon (wwwroot/favicon.svg); used by the public website and the administration. *@
+<span class="@($"flex shrink-0 items-center justify-center rounded-full bg-stone-900 text-amber-400 ring-1 ring-amber-500/30 transition {(Large ? "size-14" : "size-9")} {CssClass}")" aria-hidden="true">
+    <span class="@($"icon-[lucide--gem] {(Large ? "size-7" : "size-[1.15rem]")}")"></span>
+</span>
+
+@code {
+    /// <summary>Large variant (sign-in).</summary>
+    [Parameter] public bool Large { get; set; }
+
+    [Parameter] public string? CssClass { get; set; }
+}

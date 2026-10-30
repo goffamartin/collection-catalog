@@ -1,0 +1,313 @@
+@page "/admin/predmety/novy"
+@page "/admin/predmety/{Id:int}"
+@rendermode InteractiveServer
+
+@inject ItemEditorService Editor
+@inject NavigationManager Navigation
+@inject ListNavigation ListNav
+@inject ILogger<ItemEditor> Logger
+@inject LanguageService Languages
+
+<PageTitle>@T["{0} – administration", _isNew ? T["New item"] : _model?.Name ?? T["Item"]]</PageTitle>
+
+@if (_notFound)
+{
+    <PageHeader Title="@T["Item not found"]" OnBack="GoBackAsync" BackText="@T["Items"]" />
+    <div class="card card-body text-sm text-stone-500">@T["Item #{0} does not exist or was deleted.", Id!]</div>
+}
+else if (_model is null || _editContext is null || _lookups is null)
+{
+    <div class="flex items-center gap-2 text-sm text-stone-500">
+        <span class="icon-[lucide--loader-circle] size-4 animate-spin"></span> @T["Loading…"]
+    </div>
+}
+else
+{
+    <EditForm EditContext="_editContext" OnValidSubmit="SaveAsync" OnInvalidSubmit="() => _showErrors = true">
+        <LocalizedValidator />
+        <UnsavedChangesGuard HasChanges="HasChanges" />
+
+        <PageHeader Title="@(_isNew ? T["New item"] : _savedName)" OnBack="GoBackAsync" BackText="@T["Items"]">
+            <Description>
+                @if (_isNew)
+                {
+                    <span>@T["Fill in the basic details. Photos can be added after the first save."]</span>
+                }
+                else
+                {
+                    <span class="inline-flex flex-wrap items-center gap-2">
+                        <span>#@Id</span>
+                        @if (_model.Visibility == ItemVisibility.Public)
+                        {
+                            <ItemBadge Kind="ItemBadgeKind.Public" />
+                            <a href="@PublicUrls.Item(Id!.Value, _savedName)" target="_blank" class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 hover:underline">
+                                @T["Show on the website"] <span class="icon-[lucide--external-link] size-3"></span>
+                            </a>
+                        }
+                        else
+                        {
+                            <ItemBadge Kind="ItemBadgeKind.Private" />
+                        }
+                        @if (_model.SaleDate is not null || _model.SalePrice is not null)
+                        {
+                            <ItemBadge Kind="ItemBadgeKind.Sold" />
+                        }
+                    </span>
+                }
+            </Description>
+            <Actions>
+                @if (!_isNew)
+                {
+                    @if (_confirmDelete)
+                    {
+                        <span class="text-sm text-stone-600">@T["Really delete, including the photos?"]</span>
+                        <button type="button" class="btn-secondary" @onclick="() => _confirmDelete = false">@T["No"]</button>
+                        <button type="button" class="btn-danger-solid" @onclick="DeleteAsync">
+                            <span class="icon-[lucide--trash-2] size-4"></span> @T["Delete"]
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn-danger" @onclick="() => _confirmDelete = true">
+                            <span class="icon-[lucide--trash-2] size-4"></span> @T["Delete"]
+                        </button>
+                    }
+                }
+                <button type="submit" class="btn-primary" disabled="@(_saving || !_dirty)"
+                        title="@(_dirty ? null : T["The item details have no unsaved changes"].Value)">
+                    @if (_saving)
+                    {
+                        <span class="icon-[lucide--loader-circle] size-4 animate-spin"></span>
+                    }
+                    else
+                    {
+                        <span class="icon-[lucide--save] size-4"></span>
+                    }
+                    @T["Save"]
+                </button>
+            </Actions>
+        </PageHeader>
+
+        <EditLanguageTabs @bind-Value="_model.EditLanguage" CssClass="mb-6" />
+
+        @if (_error is not null)
+        {
+            <div class="mb-6 flex gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200" role="alert">
+                <span class="icon-[lucide--circle-alert] mt-0.5 size-4 shrink-0"></span> @_error
+            </div>
+        }
+
+        @if (_showErrors && _editContext.GetValidationMessages().Any())
+        {
+            <div class="mb-6 flex gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
+                <span class="icon-[lucide--circle-alert] mt-0.5 size-4 shrink-0"></span>
+                <div>
+                    <p class="font-medium">@T["The form contains errors"]</p>
+                    <ul class="mt-1 list-disc pl-4">
+                        @foreach (var message in _editContext.GetValidationMessages())
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <div class="grid gap-6 pb-24 xl:grid-cols-5">
+            <div class="space-y-6 xl:col-span-3">
+                <ItemBasicsSection Model="_model" Lookups="_lookups" />
+
+                <ItemConditionSection Model="_model" />
+
+                <ItemPresentationSection Model="_model" />
+
+                <ItemPrivateSection Model="_model" />
+
+                <ItemSaleSection Model="_model" />
+
+                @if (Id is { } listingItemId)
+                {
+                    <ItemListingPanel ItemId="listingItemId" ItemName="@_savedName" ItemIsPublic="_model.Visibility == ItemVisibility.Public" Language="@_model.EditLanguage"
+                                      OnSaleRecorded="SaleRecorded" DirtyChanged="dirty => _listingDirty = dirty" />
+                }
+            </div>
+
+            @* On smaller screens (phone) the photos are on top – photos are taken mostly with a phone. *@
+            <div class="order-first xl:order-none xl:col-span-2">
+                <div class="space-y-6 xl:sticky xl:top-8">
+                    @if (Id is { } itemId)
+                    {
+                        <ItemPhotos ItemId="itemId" Language="@_model.EditLanguage" DefaultLanguage="@_model.DefaultLanguage" />
+                    }
+                    else
+                    {
+                        <section class="card card-body flex flex-col items-center py-10 text-center">
+                            <span class="icon-[lucide--images] size-10 text-stone-300"></span>
+                            <p class="mt-3 font-medium text-stone-900">@T["Photos"]</p>
+                            <p class="mt-1 text-sm text-stone-500">@T["After saving the item you can upload photos here."]</p>
+                        </section>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <SaveBar Dirty="_dirty" SavedRecently="_savedRecently" Saving="_saving" OnDiscard="DiscardChangesAsync" />
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private ItemEditModel? _model;
+    private EditContext? _editContext;
+    private EditorLookups? _lookups;
+    private string _savedName = "";
+    private bool _isNew;
+    private bool _notFound;
+    private bool _dirty;
+    // An offer being edited in the „Offer for sale“ panel (saved separately).
+    private bool _listingDirty;
+    private bool _saving;
+    private bool _savedRecently;
+    private int _savedNoticeVersion;
+    private string? _error;
+    private bool _showErrors;
+    private bool _confirmDelete;
+    private bool _cameFromList;
+    private string? _markedUri;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _lookups ??= await Editor.GetLookupsAsync();
+        _isNew = Id is null;
+        _notFound = false;
+        _confirmDelete = false;
+        await LoadAsync();
+    }
+
+    /// <summary>Loads the saved state of the item (new: defaults) – when opened and on „Discard changes“.</summary>
+    private async Task LoadAsync()
+    {
+        var editLanguage = _model?.EditLanguage;
+        _model = _isNew ? await Editor.CreateNewAsync() : await Editor.GetAsync(Id!.Value);
+        if (_model is null)
+        {
+            _notFound = true;
+            return;
+        }
+
+        // "Discard changes" keeps the language being translated.
+        if (editLanguage is not null)
+        {
+            _model.EditLanguage = editLanguage;
+        }
+        _savedName = _model.NameText.Get(Languages.Current) ?? "";
+        _editContext = new EditContext(_model);
+        // The fields live in section subcomponents – their change re-renders only the section, but this page holds the save bar.
+        _editContext.OnFieldChanged += (_, _) =>
+        {
+            MarkDirty();
+            StateHasChanged();
+        };
+        _dirty = false;
+    }
+
+    private bool HasChanges() => _dirty || _listingDirty;
+
+    /// <summary>Discards unsaved edits of the item details (photos and the offer are saved separately).</summary>
+    private async Task DiscardChangesAsync()
+    {
+        _showErrors = false;
+        await LoadAsync();
+    }
+
+    private void MarkDirty()
+    {
+        _dirty = true;
+        _savedRecently = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        _error = null;
+        try
+        {
+            var id = 0;
+            if (!await SafeAction.RunAsync(Logger, "saving an item", async () => id = await Editor.SaveAsync(_model!)))
+            {
+                _error = T[SafeAction.Message];
+                return;
+            }
+            _dirty = false;
+            _showErrors = false;
+
+            if (_isNew)
+            {
+                // Replaces the „novy“ entry in the history (OnAfterRenderAsync restores the „from list“ mark).
+                Navigation.NavigateTo(AdminUrls.Item(id), replace: true);
+                return;
+            }
+
+            _savedName = _model!.NameText.Get(Languages.Current) ?? "";
+            _savedRecently = true;
+            _ = HideSavedNoticeAsync(++_savedNoticeVersion);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    /// <summary>An offer marked as sold filled in the sale – take it into the form (without „unsaved changes“, it is already in the DB).</summary>
+    private void SaleRecorded(ListingSaveResult result)
+    {
+        _model!.SalePrice = result.ItemSalePrice;
+        _model.SaleDate = result.ItemSaleDate;
+    }
+
+    private async Task HideSavedNoticeAsync(int version)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(2.5));
+        // Another save may have happened meanwhile – let its „Saved“ stay for the full time.
+        if (version == _savedNoticeVersion)
+        {
+            _savedRecently = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        _error = null;
+        if (!await SafeAction.RunAsync(Logger, "deleting an item", () => Editor.DeleteAsync(Id!.Value)))
+        {
+            _confirmDelete = false;
+            _error = T[SafeAction.Message];
+            return;
+        }
+        // The item is gone including the offer being edited – leave without asking about unsaved changes.
+        _dirty = false;
+        _listingDirty = false;
+        await GoBackAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _cameFromList = await ListNav.CameFromListAsync();
+            _markedUri = Navigation.Uri;
+        }
+        else if (_cameFromList && _markedUri != Navigation.Uri)
+        {
+            // The history entry was replaced (new item → its Id) – Blazor does not carry the mark over.
+            await ListNav.MarkAsync();
+            _markedUri = Navigation.Uri;
+        }
+    }
+
+    /// <summary>Back to the list: a step in the history (restores the filters from the URL) when coming from the list; otherwise opens the list.</summary>
+    private Task GoBackAsync() => ListNav.BackAsync(_cameFromList);
+}

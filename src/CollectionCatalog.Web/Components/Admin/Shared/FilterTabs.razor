@@ -1,0 +1,22 @@
+@typeparam TValue
+
+@* View switch above a list (open / closed / all, codebook sections). *@
+<div class="@($"inline-flex rounded-lg bg-white p-1 shadow-xs ring-1 ring-stone-200 {CssClass}")" role="group" aria-label="@Label">
+    @foreach (var (value, label) in Options)
+    {
+        var active = EqualityComparer<TValue>.Default.Equals(value, Selected);
+        <button type="button" aria-pressed="@(active ? "true" : "false")" @onclick="() => OnSelect.InvokeAsync(value)"
+                class="@($"rounded-md px-3 py-1.5 text-sm font-medium transition {(active ? "bg-stone-900 text-white" : "text-stone-600 hover:text-stone-900")}")">@label</button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<(TValue Value, string Label)> Options { get; set; } = [];
+    [Parameter, EditorRequired] public TValue Selected { get; set; } = default!;
+    [Parameter] public EventCallback<TValue> OnSelect { get; set; }
+
+    /// <summary>Label of the group for screen readers.</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+
+    [Parameter] public string? CssClass { get; set; }
+}

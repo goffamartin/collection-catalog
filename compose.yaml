@@ -1,0 +1,17 @@
+# Local run in a container: docker compose up --build  →  http://localhost:8080
+# Demo data: docker compose run --rm web seed-demo
+# First user: docker compose run --rm -it web user-set-password --username <name>
+services:
+  web:
+    build: .
+    image: collection-catalog:local
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - catalog-data:/data
+    restart: unless-stopped
+
+volumes:
+  catalog-data:

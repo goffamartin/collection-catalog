@@ -1,0 +1,54 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* Warning before leaving with unsaved changes – navigation in the application (incl. links in the static layout),
+   the browser Back button, reload and closing the window. Just put into the page:
+   <UnsavedChangesGuard HasChanges="() => _dirty" /> *@
+<NavigationLock OnBeforeInternalNavigation="ConfirmAsync" ConfirmExternalNavigation="HasChanges()" />
+
+@code {
+    private IJSObjectReference? _module;
+    private bool? _sentEnabled;
+
+    /// <summary>
+    /// Current state of unsaved changes. A function (not a value), so navigation right after saving
+    /// (before the page re-renders) already sees the new state.
+    /// </summary>
+    [Parameter, EditorRequired] public Func<bool> HasChanges { get; set; } = () => false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var enabled = HasChanges();
+        if (_sentEnabled != enabled)
+        {
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/unsaved-changes.js");
+            await _module.InvokeVoidAsync("setEnabled", enabled, T["You have unsaved changes. Leave without saving?"].Value);
+            _sentEnabled = enabled;
+        }
+    }
+
+    private async Task ConfirmAsync(LocationChangingContext context)
+    {
+        if (HasChanges() && _module is not null && !await _module.InvokeAsync<bool>("confirmLeave"))
+        {
+            context.PreventNavigation();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is null)
+        {
+            return;
+        }
+        try
+        {
+            await _module.InvokeVoidAsync("setEnabled", false);
+            await _module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The circuit is already disconnected (closed window) – the browser state is gone with it.
+        }
+    }
+}

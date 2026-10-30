@@ -1,0 +1,110 @@
+@page "/sbirka/{Id:int}/{Slug?}"
+@inject PublicItemQuery Query
+@inject NavigationManager Navigation
+
+@if (_item is null)
+{
+    return;
+}
+
+<Seo Title="@_item.Name" Path="@_item.Url" PathIn="language => PublicUrls.Item(_item.Id, _item.AllNames.Get(language) ?? _item.Name)" Description="@(_item.PublicDescription ?? Summary)" ImageKey="@_item.Images.FirstOrDefault()?.FileKey" />
+
+<div class="site-container pt-8 sm:pt-10">
+    <Breadcrumbs Items="BreadcrumbItems" />
+
+    <ItemShowcase Item="_item">
+        <Highlight>
+            @if (_item.Offer is { } offer)
+            {
+                <a href="@_item.OfferUrl" class="group mt-6 flex items-center justify-between gap-4 rounded-2xl bg-amber-50 p-4 pl-5 ring-1 ring-amber-200 transition hover:ring-amber-400">
+                    <span>
+                        <span class="block text-xs font-semibold tracking-wide text-amber-800 uppercase">
+                            @(offer.Status == ListingStatus.Reserved ? T["Reserved"] : T["This piece is for sale"])
+                        </span>
+                        <span class="mt-0.5 block font-display text-2xl font-medium text-stone-900">@PublicUrls.Price(offer.AskingPrice)</span>
+                    </span>
+                    <span class="btn shrink-0 rounded-full bg-stone-900 px-4 text-white group-hover:bg-stone-800">
+                        @T["View the offer"] <span class="icon-[lucide--arrow-right] size-4"></span>
+                    </span>
+                </a>
+            }
+        </Highlight>
+        <ChildContent>
+            @* Without an offer: a question about buying / the history of the piece. The form is collapsed to keep the detail tidy;
+               after sending (validation error / thanks) it opens. *@
+            @if (_item.Offer is null)
+            {
+                <details class="group/inquiry mt-8" open="@_inquiryOpen">
+                    <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-2xl bg-stone-900 p-6 text-white [&::-webkit-details-marker]:hidden">
+                        <span>
+                            <span class="block font-display text-lg font-medium">@T["Are you interested in this piece?"]</span>
+                            <span class="mt-1 block text-sm text-stone-400">@T["Ask about its history, condition or whether it can be bought."]</span>
+                        </span>
+                        <span class="btn shrink-0 rounded-full bg-amber-400 px-5 py-2.5 text-stone-950 group-open/inquiry:hidden">
+                            <span class="icon-[lucide--mail] size-4"></span> @T["Write a question"]
+                        </span>
+                        <span class="hidden size-9 shrink-0 items-center justify-center rounded-full bg-white/10 group-open/inquiry:flex">
+                            <span class="icon-[lucide--chevron-up] size-4"></span>
+                        </span>
+                    </summary>
+                    <InquiryForm ItemId="_item.Id" CssClass="mt-3" Title="@T["Question about this piece"]" SubmitText="@T["Send question"]"
+                                 Description="@T["We will reply by e-mail. If you are interested in buying, say so right in the message."]"
+                                 MessagePlaceholder="@T["Hello, I would like to know…"]" />
+                </details>
+            }
+        </ChildContent>
+    </ItemShowcase>
+
+    @if (_item.Related.Count > 0)
+    {
+        <section class="mt-20 border-t border-stone-200/70 pt-14">
+            <p class="eyebrow">@T["You might be interested in"]</p>
+            <h2 class="display-title mt-3 text-3xl">@T["Similar pieces"]</h2>
+            <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4">
+                @foreach (var related in _item.Related)
+                {
+                    <ItemCard Item="related" />
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    private PublicItemDetail? _item;
+    private bool _inquiryOpen;
+
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
+
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string? Slug { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _item = await Query.GetDetailAsync(Id);
+        if (_item is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        // Old or missing slug (item renamed, other language) → redirect to the current URL.
+        if (Slug != _item.Slug)
+        {
+            Navigation.NavigateTo(_item.Url, replace: true);
+            return;
+        }
+
+        // Keep a submitted form (errors / thanks) expanded.
+        _inquiryOpen = HttpMethods.IsPost(HttpContext.Request.Method) || HttpContext.Request.Query.ContainsKey("odeslano");
+    }
+
+    private List<(string Name, string? Path)> BreadcrumbItems =>
+    [
+        (T["Collection"], PublicUrls.Collection),
+        .. _item!.TypeName is { } type ? new[] { (type, (string?)$"sbirka?typ={_item.TypeId}") } : [],
+        (_item.Name, null),
+    ];
+
+    private string? Summary => string.Join(" · ", new[] { _item!.CountryName, _item.Years }.Where(s => s is not null)) is { Length: > 0 } s ? s : null;
+}

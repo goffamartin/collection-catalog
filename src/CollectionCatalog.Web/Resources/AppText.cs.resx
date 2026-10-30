@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Czech UI texts. Keys are the English texts in code (see AppText.cs); English needs no file. -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="(optional)" xml:space="preserve"><value>(nepovinné)</value></data>
+  <data name=", or browse the" xml:space="preserve"><value>, nebo si prohlédněte</value></data>
+  <data name="A forgotten password is reset by the administrator." xml:space="preserve"><value>Zapomenuté heslo vám nastaví správce.</value></data>
+  <data name="A short paragraph below the headline; also used as the description of the website in search engines." xml:space="preserve"><value>Krátký odstavec pod nadpisem; použije se i jako popis webu ve vyhledávačích.</value></data>
+  <data name="About the collection" xml:space="preserve"><value>O sbírce</value></data>
+  <data name="Accepted [inquiry]" xml:space="preserve"><value>Přijatá</value></data>
+  <data name="Accessories" xml:space="preserve"><value>Příslušenství</value></data>
+  <data name="Active [listing]" xml:space="preserve"><value>Aktivní</value></data>
+  <data name="Add" xml:space="preserve"><value>Přidat</value></data>
+  <data name="Administration" xml:space="preserve"><value>Administrace</value></data>
+  <data name="After saving the item you can upload photos here." xml:space="preserve"><value>Po uložení předmětu sem budete moci nahrát fotky.</value></data>
+  <data name="After saving, the offer is closed and disappears from the website." xml:space="preserve"><value>Po uložení se nabídka uzavře a zmizí z webu.</value></data>
+  <data name="All" xml:space="preserve"><value>Vše</value></data>
+  <data name="All categories" xml:space="preserve"><value>Všechny kategorie</value></data>
+  <data name="All countries" xml:space="preserve"><value>Všechny země</value></data>
+  <data name="All types" xml:space="preserve"><value>Všechny typy</value></data>
+  <data name="An error has occurred" xml:space="preserve"><value>Nastala chyba</value></data>
+  <data name="An error occurred while processing the request. Please try again." xml:space="preserve"><value>Při zpracování požadavku došlo k chybě. Zkuste to prosím znovu.</value></data>
+  <data name="An unexpected error has occurred." xml:space="preserve"><value>Nastala neočekávaná chyba.</value></data>
+  <data name="Application in English" xml:space="preserve"><value>Aplikace anglicky</value></data>
+  <data name="Application texts" xml:space="preserve"><value>Texty aplikace</value></data>
+  <data name="Archived [inquiry]" xml:space="preserve"><value>Archivovaná</value></data>
+  <data name="Are you interested in this piece?" xml:space="preserve"><value>Máte o tento kus zájem?</value></data>
+  <data name="Ask about its history, condition or whether it can be bought." xml:space="preserve"><value>Zeptejte se na historii, stav nebo možnost koupě.</value></data>
+  <data name="Asking price" xml:space="preserve"><value>Požadovaná cena</value></data>
+  <data name="At least {0} characters." xml:space="preserve"><value>Alespoň {0} znaků.</value></data>
+  <data name="auction, fair, collector…" xml:space="preserve"><value>aukce, burza, sběratel…</value></data>
+  <data name="Average" xml:space="preserve"><value>Průměrný</value></data>
+  <data name="Back" xml:space="preserve"><value>Zadní strana</value></data>
+  <data name="Back to the list" xml:space="preserve"><value>Zpět na seznam</value></data>
+  <data name="Badge color" xml:space="preserve"><value>Barva štítku</value></data>
+  <data name="Basic details" xml:space="preserve"><value>Základní údaje</value></data>
+  <data name="Breadcrumbs" xml:space="preserve"><value>Drobečková navigace</value></data>
+  <data name="Browse" xml:space="preserve"><value>Procházet</value></data>
+  <data name="Browse the collection" xml:space="preserve"><value>Prohlédnout sbírku</value></data>
+  <data name="Buyers can propose a price" xml:space="preserve"><value>Zájemci mohou navrhnout cenu</value></data>
+  <data name="By type and country" xml:space="preserve"><value>Podle typu a země</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Zrušit</value></data>
+  <data name="Caption (optional)" xml:space="preserve"><value>Popisek (volitelný)</value></data>
+  <data name="Catalogue" xml:space="preserve"><value>Katalog</value></data>
+  <data name="Catalogue of the collection – {0}." xml:space="preserve"><value>Katalog sbírky – {0}.</value></data>
+  <data name="Categories" xml:space="preserve"><value>Kategorie</value></data>
+  <data name="Category" xml:space="preserve"><value>Kategorie</value></data>
+  <data name="Certificate" xml:space="preserve"><value>Certifikát</value></data>
+  <data name="Certificate / label" xml:space="preserve"><value>Certifikát / štítek</value></data>
+  <data name="certificate [accessory]" xml:space="preserve"><value>certifikát</value></data>
+  <data name="Change password" xml:space="preserve"><value>Změna hesla</value></data>
+  <data name="Change password [action]" xml:space="preserve"><value>Změnit heslo</value></data>
+  <data name="Clear" xml:space="preserve"><value>Zrušit</value></data>
+  <data name="Clear all" xml:space="preserve"><value>Zrušit vše</value></data>
+  <data name="Clear selection" xml:space="preserve"><value>Zrušit výběr</value></data>
+  <data name="clearing the filters" xml:space="preserve"><value>zrušit filtry</value></data>
+  <data name="Close" xml:space="preserve"><value>Zavřít</value></data>
+  <data name="Closed" xml:space="preserve"><value>Uzavřené</value></data>
+  <data name="closed {0}" xml:space="preserve"><value>uzavřeno {0}</value></data>
+  <data name="Codebook" xml:space="preserve"><value>Číselník</value></data>
+  <data name="Codebooks" xml:space="preserve"><value>Číselníky</value></data>
+  <data name="Codebooks – administration" xml:space="preserve"><value>Číselníky – administrace</value></data>
+  <data name="Collection" xml:space="preserve"><value>Sbírka</value></data>
+  <data name="collection [link]" xml:space="preserve"><value>sbírku</value></data>
+  <data name="Color" xml:space="preserve"><value>Barva</value></data>
+  <data name="Condition" xml:space="preserve"><value>Stav</value></data>
+  <data name="Condition and accessories" xml:space="preserve"><value>Stav a příslušenství</value></data>
+  <data name="Consent with the processing of the data is required to send the form." xml:space="preserve"><value>Pro odeslání je potřeba souhlas se zpracováním údajů.</value></data>
+  <data name="Contact" xml:space="preserve"><value>Kontakt</value></data>
+  <data name="contact form" xml:space="preserve"><value>kontaktní formulář</value></data>
+  <data name="Contact {0} – questions about the collection and individual pieces." xml:space="preserve"><value>Kontakt na {0} – dotazy ke sbírce a jednotlivým kusům.</value></data>
+  <data name="Content of the website" xml:space="preserve"><value>Obsah webu</value></data>
+  <data name="Cookies and analytics" xml:space="preserve"><value>Cookies a měření návštěvnosti</value></data>
+  <data name="Copy" xml:space="preserve"><value>Kopie</value></data>
+  <data name="Countries" xml:space="preserve"><value>Země</value></data>
+  <data name="Country" xml:space="preserve"><value>Země</value></data>
+  <data name="Country|Countries" xml:space="preserve"><value>Země|Země|Zemí</value></data>
+  <data name="created {0}" xml:space="preserve"><value>založeno {0}</value></data>
+  <data name="Current password" xml:space="preserve"><value>Současné heslo</value></data>
+  <data name="Damaged" xml:space="preserve"><value>Poškozený</value></data>
+  <data name="Declined [inquiry]" xml:space="preserve"><value>Odmítnutá</value></data>
+  <data name="Default" xml:space="preserve"><value>Výchozí</value></data>
+  <data name="Delete" xml:space="preserve"><value>Smazat</value></data>
+  <data name="Delete photo" xml:space="preserve"><value>Smazat fotku</value></data>
+  <data name="Delete the inquiry including the personal data?" xml:space="preserve"><value>Smazat poptávku i s osobními údaji?</value></data>
+  <data name="Delete the photo?" xml:space="preserve"><value>Smazat fotku?</value></data>
+  <data name="Description for visitors" xml:space="preserve"><value>Popis pro návštěvníky</value></data>
+  <data name="Detail" xml:space="preserve"><value>Detail</value></data>
+  <data name="Discard" xml:space="preserve"><value>Zrušit</value></data>
+  <data name="Discard changes" xml:space="preserve"><value>Zrušit změny</value></data>
+  <data name="Do you have a question about the collection or one of the pieces, or would you like to offer us something? Write to us." xml:space="preserve"><value>Máte dotaz ke sbírce, k některému z kusů, nebo nám chcete něco nabídnout? Napište nám.</value></data>
+  <data name="Documentation" xml:space="preserve"><value>Dokumentace</value></data>
+  <data name="documentation [accessory]" xml:space="preserve"><value>dokumentace</value></data>
+  <data name="Draft [listing]" xml:space="preserve"><value>Rozpracovaná</value></data>
+  <data name="Drag photos here or click" xml:space="preserve"><value>Přetáhněte fotky sem nebo klikněte</value></data>
+  <data name="E-mail" xml:space="preserve"><value>E-mail</value></data>
+  <data name="e.g. Amethyst geode from Brazil" xml:space="preserve"><value>např. Ametystová geoda z Brazílie</value></data>
+  <data name="e.g. condition details, possible handover in person…" xml:space="preserve"><value>např. podrobnosti o stavu, možnost osobního předání…</value></data>
+  <data name="earlier offers: {0}" xml:space="preserve"><value>dřívějších nabídek: {0}</value></data>
+  <data name="Edit" xml:space="preserve"><value>Upravit</value></data>
+  <data name="Empty = „price on request“. The price is public on the website." xml:space="preserve"><value>Prázdné = „cena dohodou“. Cena je na webu veřejná.</value></data>
+  <data name="Empty so far." xml:space="preserve"><value>Zatím prázdné.</value></data>
+  <data name="Enter a name." xml:space="preserve"><value>Zadejte název.</value></data>
+  <data name="Enter a non-negative amount." xml:space="preserve"><value>Zadejte nezápornou částku.</value></data>
+  <data name="Enter a two-letter language code (ISO 639-1), e.g. de." xml:space="preserve"><value>Zadejte dvoupísmenný kód jazyka (ISO 639-1), např. de.</value></data>
+  <data name="Enter a valid e-mail." xml:space="preserve"><value>Zadejte platný e-mail.</value></data>
+  <data name="Enter a year {1}–{2}." xml:space="preserve"><value>Zadejte rok {1}–{2}.</value></data>
+  <data name="Enter the current password." xml:space="preserve"><value>Zadejte současné heslo.</value></data>
+  <data name="Enter the name in the default language." xml:space="preserve"><value>Zadejte název ve výchozím jazyce.</value></data>
+  <data name="Enter the name of the language (at most {0} characters)." xml:space="preserve"><value>Zadejte název jazyka (nejvýše {0} znaků).</value></data>
+  <data name="Enter the new password." xml:space="preserve"><value>Zadejte nové heslo.</value></data>
+  <data name="Enter the password." xml:space="preserve"><value>Zadejte heslo.</value></data>
+  <data name="Enter the user name." xml:space="preserve"><value>Zadejte uživatelské jméno.</value></data>
+  <data name="Error" xml:space="preserve"><value>Chyba</value></data>
+  <data name="Error 404" xml:space="preserve"><value>Chyba 404</value></data>
+  <data name="Estimate" xml:space="preserve"><value>Odhad</value></data>
+  <data name="Estimated value" xml:space="preserve"><value>Odhadovaná hodnota</value></data>
+  <data name="Excellent" xml:space="preserve"><value>Výborný</value></data>
+  <data name="Exchange possible" xml:space="preserve"><value>Možná výměna</value></data>
+  <data name="exchange possible [inline]" xml:space="preserve"><value>možná výměna</value></data>
+  <data name="Feature on the home page" xml:space="preserve"><value>Zvýraznit na úvodní stránce</value></data>
+  <data name="Fields marked with a language are translatable. Other data is shared by all languages." xml:space="preserve"><value>Pole označená jazykem se překládají. Ostatní údaje jsou společné pro všechny jazyky.</value></data>
+  <data name="Fill in the basic details. Photos can be added after the first save." xml:space="preserve"><value>Vyplňte základní údaje. Fotky půjde přidat po prvním uložení.</value></data>
+  <data name="Fill in the main headline in the default language." xml:space="preserve"><value>Vyplňte hlavní nadpis ve výchozím jazyce.</value></data>
+  <data name="Fill in the name of the website in the default language." xml:space="preserve"><value>Vyplňte název webu ve výchozím jazyce.</value></data>
+  <data name="Fill in your e-mail so we can reply." xml:space="preserve"><value>Vyplňte e-mail, ať vám můžeme odpovědět.</value></data>
+  <data name="Fill in your name." xml:space="preserve"><value>Vyplňte jméno.</value></data>
+  <data name="Filled into the sale details of the item (unless something is already there), together with today's date." xml:space="preserve"><value>Doplní se do údajů o prodeji předmětu (pokud tam ještě nic není), spolu s dnešním datem.</value></data>
+  <data name="Filter" xml:space="preserve"><value>Filtrovat</value></data>
+  <data name="Footer" xml:space="preserve"><value>Patička</value></data>
+  <data name="For sale and exchange" xml:space="preserve"><value>Na prodej a výměnu</value></data>
+  <data name="for the purpose of replying to my message." xml:space="preserve"><value>za účelem odpovědi na můj dotaz.</value></data>
+  <data name="From the collection" xml:space="preserve"><value>Výběr ze sbírky</value></data>
+  <data name="From the gallery" xml:space="preserve"><value>Z galerie</value></data>
+  <data name="From the offer" xml:space="preserve"><value>Z nabídky</value></data>
+  <data name="from {0}" xml:space="preserve"><value>od {0}</value></data>
+  <data name="Front" xml:space="preserve"><value>Přední strana</value></data>
+  <data name="General question" xml:space="preserve"><value>Obecný dotaz</value></data>
+  <data name="Go to items" xml:space="preserve"><value>Přejít na předměty</value></data>
+  <data name="Good" xml:space="preserve"><value>Dobrý</value></data>
+  <data name="h:mm tt" xml:space="preserve"><value>H:mm</value></data>
+  <data name="Handled" xml:space="preserve"><value>Vyřízené</value></data>
+  <data name="Handled ones (replied, accepted, declined, archived) are deleted automatically after a year." xml:space="preserve"><value>Vyřízené (zodpovězené, přijaté, odmítnuté, archivované) se po roce automaticky smažou.</value></data>
+  <data name="Hello,&#10;&#10;&#10;&#10;---&#10;{0} wrote on {1}:&#10;{2}" xml:space="preserve"><value>Dobrý den,
+
+
+
+---
+{0} napsal(a) {1}:
+{2}</value></data>
+  <data name="Hello, I am interested in this piece. I could also offer in exchange…" xml:space="preserve"><value>Dobrý den, mám zájem o tento kus. Případně nabízím k výměně…</value></data>
+  <data name="Hello, I am interested in this piece…" xml:space="preserve"><value>Dobrý den, mám zájem o tento kus…</value></data>
+  <data name="Hello, I would like to know…" xml:space="preserve"><value>Dobrý den, zajímalo by mě…</value></data>
+  <data name="Hello, …" xml:space="preserve"><value>Dobrý den, …</value></data>
+  <data name="Hidden from the website: {0}." xml:space="preserve"><value>Skryto z webu: {0}.</value></data>
+  <data name="Hide from the website" xml:space="preserve"><value>Skrýt z webu</value></data>
+  <data name="Hide on the website" xml:space="preserve"><value>Skrýt na webu</value></data>
+  <data name="Home page" xml:space="preserve"><value>Úvodní stránka</value></data>
+  <data name="How the collection came about, what it focuses on…" xml:space="preserve"><value>Jak sbírka vznikla, na co se zaměřuje…</value></data>
+  <data name="How we process personal data from the forms on the website." xml:space="preserve"><value>Jak zpracováváme osobní údaje z formulářů na webu.</value></data>
+  <data name="I agree with the" xml:space="preserve"><value>Souhlasím se</value></data>
+  <data name="I am interested" xml:space="preserve"><value>Mám zájem</value></data>
+  <data name="In the collection" xml:space="preserve"><value>Ve sbírce</value></data>
+  <data name="In the header, the footer and the title of the browser tab." xml:space="preserve"><value>V hlavičce, patičce a v titulku záložky prohlížeče.</value></data>
+  <data name="Incorrect password." xml:space="preserve"><value>Nesprávné heslo.</value></data>
+  <data name="Incorrect user name or password." xml:space="preserve"><value>Nesprávné uživatelské jméno nebo heslo.</value></data>
+  <data name="Inquiries" xml:space="preserve"><value>Poptávky</value></data>
+  <data name="Inquiries – administration" xml:space="preserve"><value>Poptávky – administrace</value></data>
+  <data name="Inquiries: {0}" xml:space="preserve"><value>Poptávky: {0}</value></data>
+  <data name="Interested in buying?" xml:space="preserve"><value>Zájem o koupi?</value></data>
+  <data name="Interested in case the reservation falls through?" xml:space="preserve"><value>Máte zájem, kdyby rezervace padla?</value></data>
+  <data name="Internal note" xml:space="preserve"><value>Interní poznámka</value></data>
+  <data name="Intro text" xml:space="preserve"><value>Úvodní text</value></data>
+  <data name="Invalid e-mail." xml:space="preserve"><value>Neplatný e-mail.</value></data>
+  <data name="Item" xml:space="preserve"><value>Předmět</value></data>
+  <data name="Item #{0} does not exist or was deleted." xml:space="preserve"><value>Předmět #{0} neexistuje nebo byl smazán.</value></data>
+  <data name="Item not found" xml:space="preserve"><value>Předmět nenalezen</value></data>
+  <data name="Item types" xml:space="preserve"><value>Typy předmětů</value></data>
+  <data name="Item types, categories and countries to choose from in the editor, and the languages of the website." xml:space="preserve"><value>Typy předmětů, kategorie a země, ze kterých se vybírá v editoru, a jazyky webu.</value></data>
+  <data name="Items" xml:space="preserve"><value>Předměty</value></data>
+  <data name="Items [count]" xml:space="preserve"><value>Předmětů</value></data>
+  <data name="Items – administration" xml:space="preserve"><value>Předměty – administrace</value></data>
+  <data name="Items, codebooks and website texts get a translation for every language listed here – edited in the forms with the language switch. Missing translations show the default language." xml:space="preserve"><value>Předměty, číselníky a texty webu mají překlad pro každý jazyk z tohoto seznamu – upravuje se ve formulářích přepínačem jazyka. Kde překlad chybí, zobrazí se výchozí jazyk.</value></data>
+  <data name="Item|Items" xml:space="preserve"><value>Předmět|Předměty|Předmětů</value></data>
+  <data name="JPG, PNG, WebP · up to {0} MB · several at once" xml:space="preserve"><value>JPG, PNG, WebP · až {0} MB · i více najednou</value></data>
+  <data name="Just for you – the visitor will not see it." xml:space="preserve"><value>Jen pro vás – návštěvník ji neuvidí.</value></data>
+  <data name="Language" xml:space="preserve"><value>Jazyk</value></data>
+  <data name="Language code" xml:space="preserve"><value>Kód jazyka</value></data>
+  <data name="Language of the texts" xml:space="preserve"><value>Jazyk textů</value></data>
+  <data name="Language „{0}“ already exists." xml:space="preserve"><value>Jazyk „{0}“ už existuje.</value></data>
+  <data name="Language: {0}" xml:space="preserve"><value>Jazyk: {0}</value></data>
+  <data name="Languages" xml:space="preserve"><value>Jazyky</value></data>
+  <data name="Leave us your contact and a message – we will get back to you by e-mail." xml:space="preserve"><value>Nechte nám kontakt a zprávu – ozveme se vám e-mailem.</value></data>
+  <data name="Legal basis and retention" xml:space="preserve"><value>Právní základ a doba uložení</value></data>
+  <data name="Loading…" xml:space="preserve"><value>Načítám…</value></data>
+  <data name="Log out" xml:space="preserve"><value>Odhlásit</value></data>
+  <data name="Looking for a particular piece?" xml:space="preserve"><value>Hledáte konkrétní kus?</value></data>
+  <data name="M/d" xml:space="preserve"><value>d. M.</value></data>
+  <data name="M/d/yyyy" xml:space="preserve"><value>d. M. yyyy</value></data>
+  <data name="M/d/yyyy h:mm tt" xml:space="preserve"><value>d. M. yyyy H:mm</value></data>
+  <data name="Main" xml:space="preserve"><value>Hlavní</value></data>
+  <data name="Main headline" xml:space="preserve"><value>Hlavní nadpis</value></data>
+  <data name="Main navigation" xml:space="preserve"><value>Hlavní navigace</value></data>
+  <data name="Make default" xml:space="preserve"><value>Nastavit jako výchozí</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menu</value></data>
+  <data name="Menus, buttons and messages are not translated here but in the file {0} of the application (source code). Add a language with the same code and the file is used automatically; without it they show in English." xml:space="preserve"><value>Menu, tlačítka a hlášky se nepřekládají tady, ale v souboru {0} ve zdrojovém kódu aplikace. Přidejte jazyk se stejným kódem a soubor se použije automaticky; bez něj se zobrazí anglicky.</value></data>
+  <data name="Message" xml:space="preserve"><value>Zpráva</value></data>
+  <data name="Missing {0} – the application texts show in English." xml:space="preserve"><value>Chybí {0} – texty aplikace se zobrazí anglicky.</value></data>
+  <data name="More pieces for sale" xml:space="preserve"><value>Další kusy na prodej</value></data>
+  <data name="Move back" xml:space="preserve"><value>Posunout dozadu</value></data>
+  <data name="Move forward" xml:space="preserve"><value>Posunout dopředu</value></data>
+  <data name="My account" xml:space="preserve"><value>Můj účet</value></data>
+  <data name="My account – administration" xml:space="preserve"><value>Můj účet – administrace</value></data>
+  <data name="Name" xml:space="preserve"><value>Název</value></data>
+  <data name="Name [person]" xml:space="preserve"><value>Jméno</value></data>
+  <data name="Name A–Z" xml:space="preserve"><value>Název A–Z</value></data>
+  <data name="Name in the language itself, e.g. Deutsch" xml:space="preserve"><value>Název v daném jazyce, např. Deutsch</value></data>
+  <data name="Never published" xml:space="preserve"><value>Nikdy se nezveřejňují</value></data>
+  <data name="New [inquiry]" xml:space="preserve"><value>Nová</value></data>
+  <data name="New category, e.g. Air Force" xml:space="preserve"><value>Nová kategorie, např. Letectvo</value></data>
+  <data name="New country, e.g. Yugoslavia" xml:space="preserve"><value>Nová země, např. Jugoslávie</value></data>
+  <data name="New entries are created in the default language ({0}). Here just fill in the translations of the names." xml:space="preserve"><value>Nové položky se zakládají ve výchozím jazyce ({0}). Tady jen doplňte překlady názvů.</value></data>
+  <data name="New item" xml:space="preserve"><value>Nový předmět</value></data>
+  <data name="New name" xml:space="preserve"><value>Nový název</value></data>
+  <data name="New password" xml:space="preserve"><value>Nové heslo</value></data>
+  <data name="New password again" xml:space="preserve"><value>Nové heslo znovu</value></data>
+  <data name="New questions from the website appear here." xml:space="preserve"><value>Nové dotazy z webu se objeví tady.</value></data>
+  <data name="New type, e.g. Miniature" xml:space="preserve"><value>Nový typ, např. Miniatura</value></data>
+  <data name="Newest first" xml:space="preserve"><value>Od nejmladších</value></data>
+  <data name="Next" xml:space="preserve"><value>Další</value></data>
+  <data name="Next page" xml:space="preserve"><value>Další stránka</value></data>
+  <data name="Next photo" xml:space="preserve"><value>Další fotka</value></data>
+  <data name="No" xml:space="preserve"><value>Ne</value></data>
+  <data name="No closed offers" xml:space="preserve"><value>Žádné uzavřené nabídky</value></data>
+  <data name="No inquiries" xml:space="preserve"><value>Žádné poptávky</value></data>
+  <data name="No photo" xml:space="preserve"><value>Bez fotky</value></data>
+  <data name="No photos yet. The first one uploaded will be the main one." xml:space="preserve"><value>Zatím žádné fotky. První nahraná bude hlavní.</value></data>
+  <data name="No unsaved changes" xml:space="preserve"><value>Žádné neuložené změny</value></data>
+  <data name="Not determined" xml:space="preserve"><value>Neurčeno</value></data>
+  <data name="not in collection" xml:space="preserve"><value>mimo sbírku</value></data>
+  <data name="Not public" xml:space="preserve"><value>Neveřejná</value></data>
+  <data name="not translated" xml:space="preserve"><value>nepřeloženo</value></data>
+  <data name="Note to the offer" xml:space="preserve"><value>Poznámka k nabídce</value></data>
+  <data name="Notes" xml:space="preserve"><value>Poznámky</value></data>
+  <data name="Nothing found" xml:space="preserve"><value>Nic nenalezeno</value></data>
+  <data name="Nothing on offer at the moment" xml:space="preserve"><value>Momentálně nic nenabízíme</value></data>
+  <data name="Nothing on offer yet" xml:space="preserve"><value>Zatím nic v nabídce</value></data>
+  <data name="Nothing waiting to be handled" xml:space="preserve"><value>Nic nečeká na vyřízení</value></data>
+  <data name="of" xml:space="preserve"><value>z</value></data>
+  <data name="Offer" xml:space="preserve"><value>Nabídka</value></data>
+  <data name="offer [link]" xml:space="preserve"><value>nabídce</value></data>
+  <data name="Offer for sale" xml:space="preserve"><value>Nabídka k prodeji</value></data>
+  <data name="Offer for sale [action]" xml:space="preserve"><value>Nabídnout k prodeji</value></data>
+  <data name="Offers" xml:space="preserve"><value>Nabídky</value></data>
+  <data name="Offers [price]" xml:space="preserve"><value>Nabízí</value></data>
+  <data name="Offers on the website" xml:space="preserve"><value>Nabídka na webu</value></data>
+  <data name="offers {0}" xml:space="preserve"><value>nabízí {0}</value></data>
+  <data name="Offers – administration" xml:space="preserve"><value>Nabídky – administrace</value></data>
+  <data name="Oldest first" xml:space="preserve"><value>Od nejstarších</value></data>
+  <data name="On offer" xml:space="preserve"><value>V nabídce</value></data>
+  <data name="on request" xml:space="preserve"><value>dohodou</value></data>
+  <data name="On the website" xml:space="preserve"><value>Na webu</value></data>
+  <data name="On the website in the Offers section." xml:space="preserve"><value>Na webu v sekci Nabídka.</value></data>
+  <data name="On the website marked „Reserved“." xml:space="preserve"><value>Na webu s označením „Rezervováno“.</value></data>
+  <data name="Only this item – clear" xml:space="preserve"><value>Jen tento předmět – zrušit</value></data>
+  <data name="Only this offer – clear" xml:space="preserve"><value>Jen tato nabídka – zrušit</value></data>
+  <data name="Open" xml:space="preserve"><value>Otevřené</value></data>
+  <data name="Open an item and in the section „Offer for sale“ click „Offer for sale“." xml:space="preserve"><value>Otevřete předmět a v sekci „Nabídka k prodeji“ klikněte na „Nabídnout k prodeji“.</value></data>
+  <data name="Open large" xml:space="preserve"><value>Otevřít ve velkém</value></data>
+  <data name="or via the" xml:space="preserve"><value>nebo přes</value></data>
+  <data name="Origin, previous owners…" xml:space="preserve"><value>Původ, předchozí majitelé…</value></data>
+  <data name="Original" xml:space="preserve"><value>Originál</value></data>
+  <data name="Original box / case" xml:space="preserve"><value>Původní krabička / pouzdro</value></data>
+  <data name="original box [accessory]" xml:space="preserve"><value>původní krabička</value></data>
+  <data name="Originality" xml:space="preserve"><value>Originalita</value></data>
+  <data name="Other" xml:space="preserve"><value>Ostatní</value></data>
+  <data name="Packaging" xml:space="preserve"><value>Obal</value></data>
+  <data name="Page not found" xml:space="preserve"><value>Stránka nenalezena</value></data>
+  <data name="Page {0}" xml:space="preserve"><value>Stránka {0}</value></data>
+  <data name="Pagination" xml:space="preserve"><value>Stránkování</value></data>
+  <data name="Paging" xml:space="preserve"><value>Stránkování</value></data>
+  <data name="Password" xml:space="preserve"><value>Heslo</value></data>
+  <data name="Period" xml:space="preserve"><value>Období</value></data>
+  <data name="Phone" xml:space="preserve"><value>Telefon</value></data>
+  <data name="Photo" xml:space="preserve"><value>Fotka</value></data>
+  <data name="Photo caption" xml:space="preserve"><value>Popisek fotky</value></data>
+  <data name="Photo type" xml:space="preserve"><value>Typ fotky</value></data>
+  <data name="Photo {0}: {1}" xml:space="preserve"><value>Fotka {0}: {1}</value></data>
+  <data name="Photos" xml:space="preserve"><value>Fotky</value></data>
+  <data name="Photos: {0}" xml:space="preserve"><value>Fotky: {0}</value></data>
+  <data name="Pieces for sale and trade. A new offer is created in the item detail (section „Offer for sale“)." xml:space="preserve"><value>Kusy na prodej a výměnu. Novou nabídku založíte v detailu předmětu (sekce „Nabídka k prodeji“).</value></data>
+  <data name="Pieces from the collection for sale or exchange." xml:space="preserve"><value>Kusy ze sbírky na prodej nebo výměnu.</value></data>
+  <data name="Pieces from the collection we offer for sale or exchange. For each you can leave your contact and a message, or propose your own price." xml:space="preserve"><value>Kusy, které ze sbírky nabízíme k prodeji nebo výměně. U každého můžete zanechat kontakt a zprávu, případně navrhnout vlastní cenu.</value></data>
+  <data name="Pieces on offer" xml:space="preserve"><value>Kusy v nabídce</value></data>
+  <data name="pieces to photograph" xml:space="preserve"><value>kusy k nafocení</value></data>
+  <data name="Poor" xml:space="preserve"><value>Špatný</value></data>
+  <data name="Prepared, not on the website yet." xml:space="preserve"><value>Připravená, na webu zatím není.</value></data>
+  <data name="Presentation on the website" xml:space="preserve"><value>Prezentace na webu</value></data>
+  <data name="Previous" xml:space="preserve"><value>Předchozí</value></data>
+  <data name="Previous page" xml:space="preserve"><value>Předchozí stránka</value></data>
+  <data name="Previous photo" xml:space="preserve"><value>Předchozí fotka</value></data>
+  <data name="Price" xml:space="preserve"><value>Cena</value></data>
+  <data name="Price by agreement" xml:space="preserve"><value>Cena dohodou</value></data>
+  <data name="price on request" xml:space="preserve"><value>cena dohodou</value></data>
+  <data name="Privacy policy" xml:space="preserve"><value>Ochrana osobních údajů</value></data>
+  <data name="Private" xml:space="preserve"><value>Soukromý</value></data>
+  <data name="Private collection" xml:space="preserve"><value>Soukromá sbírka</value></data>
+  <data name="Private details" xml:space="preserve"><value>Soukromé údaje</value></data>
+  <data name="processing of personal data" xml:space="preserve"><value>zpracováním osobních údajů</value></data>
+  <data name="Processing {0} / {1}…" xml:space="preserve"><value>Zpracovávám {0} / {1}…</value></data>
+  <data name="Profit from the sale:" xml:space="preserve"><value>Zisk z prodeje:</value></data>
+  <data name="Provenance" xml:space="preserve"><value>Provenience</value></data>
+  <data name="Public" xml:space="preserve"><value>Veřejný</value></data>
+  <data name="Public website" xml:space="preserve"><value>Veřejný web</value></data>
+  <data name="Public – shown with the offer on the website." xml:space="preserve"><value>Veřejná – zobrazí se u nabídky na webu.</value></data>
+  <data name="Publish" xml:space="preserve"><value>Zveřejnit</value></data>
+  <data name="published {0}" xml:space="preserve"><value>zveřejněno {0}</value></data>
+  <data name="Published: {0}." xml:space="preserve"><value>Zveřejněno: {0}.</value></data>
+  <data name="Purchase" xml:space="preserve"><value>Nákup</value></data>
+  <data name="Purchase date" xml:space="preserve"><value>Datum nákupu</value></data>
+  <data name="Purchase price" xml:space="preserve"><value>Nákupní cena</value></data>
+  <data name="Purchase value" xml:space="preserve"><value>Nákupní hodnota</value></data>
+  <data name="Question about a piece of the collection" xml:space="preserve"><value>Dotaz ke kusu ze sbírky</value></data>
+  <data name="Question about the item" xml:space="preserve"><value>Dotaz k předmětu</value></data>
+  <data name="Question about this piece" xml:space="preserve"><value>Dotaz k tomuto kusu</value></data>
+  <data name="Questions and replies to offers from the website. Reply by e-mail; mark the status here to keep track of what is done." xml:space="preserve"><value>Dotazy a reakce na nabídky z webu. Odpovídá se e-mailem; stav si tu značte, ať je přehled, co je vyřízené.</value></data>
+  <data name="Read [inquiry]" xml:space="preserve"><value>Přečtená</value></data>
+  <data name="Really delete, including the photos?" xml:space="preserve"><value>Opravdu smazat i s fotkami?</value></data>
+  <data name="Recently added" xml:space="preserve"><value>Naposledy přidané</value></data>
+  <data name="Records of the whole collection including private details." xml:space="preserve"><value>Evidence celé sbírky včetně soukromých údajů.</value></data>
+  <data name="Reload" xml:space="preserve"><value>Načíst znovu</value></data>
+  <data name="Remove filter" xml:space="preserve"><value>Zrušit filtr</value></data>
+  <data name="Remove {0} from the website? Translations stay stored and come back if you add the language again." xml:space="preserve"><value>Odebrat jazyk {0} z webu? Překlady zůstanou uložené a vrátí se, když jazyk znovu přidáte.</value></data>
+  <data name="Replica" xml:space="preserve"><value>Replika</value></data>
+  <data name="Replied [inquiry]" xml:space="preserve"><value>Zodpovězená</value></data>
+  <data name="Reply by e-mail" xml:space="preserve"><value>Odpovědět e-mailem</value></data>
+  <data name="Reply to an offer" xml:space="preserve"><value>Reakce na nabídku</value></data>
+  <data name="Request ID" xml:space="preserve"><value>ID požadavku</value></data>
+  <data name="Reserved" xml:space="preserve"><value>Rezervováno</value></data>
+  <data name="Reserved [listing]" xml:space="preserve"><value>Rezervovaná</value></data>
+  <data name="Results" xml:space="preserve"><value>Výsledky</value></data>
+  <data name="Rotate left" xml:space="preserve"><value>Otočit doleva</value></data>
+  <data name="Rotate right" xml:space="preserve"><value>Otočit doprava</value></data>
+  <data name="Sale" xml:space="preserve"><value>Prodej</value></data>
+  <data name="Sale date" xml:space="preserve"><value>Datum prodeje</value></data>
+  <data name="Sale price" xml:space="preserve"><value>Prodejní cena</value></data>
+  <data name="Save" xml:space="preserve"><value>Uložit</value></data>
+  <data name="Save changes" xml:space="preserve"><value>Uložit změny</value></data>
+  <data name="Save note" xml:space="preserve"><value>Uložit poznámku</value></data>
+  <data name="Save offer" xml:space="preserve"><value>Uložit nabídku</value></data>
+  <data name="Saved" xml:space="preserve"><value>Uloženo</value></data>
+  <data name="Saved immediately, without the Save button" xml:space="preserve"><value>Ukládají se hned, bez tlačítka Uložit</value></data>
+  <data name="Saving…" xml:space="preserve"><value>Ukládám…</value></data>
+  <data name="Search" xml:space="preserve"><value>Hledat</value></data>
+  <data name="Search items" xml:space="preserve"><value>Hledat předměty</value></data>
+  <data name="Search name, country, description…" xml:space="preserve"><value>Hledat název, zemi, popis…</value></data>
+  <data name="Search name, country, notes, #id…" xml:space="preserve"><value>Hledat název, zemi, poznámky, #id…</value></data>
+  <data name="Search the collection" xml:space="preserve"><value>Hledat ve sbírce</value></data>
+  <data name="Search…" xml:space="preserve"><value>Hledat…</value></data>
+  <data name="Select all on the page" xml:space="preserve"><value>Vybrat vše na stránce</value></data>
+  <data name="Select an inquiry on the left." xml:space="preserve"><value>Vyberte poptávku vlevo.</value></data>
+  <data name="Select {0}" xml:space="preserve"><value>Vybrat {0}</value></data>
+  <data name="Selected pieces" xml:space="preserve"><value>Vybrané kusy</value></data>
+  <data name="Selected pieces appear on the home page of the website." xml:space="preserve"><value>Vybrané kusy se ukážou na titulní stránce webu.</value></data>
+  <data name="Selected: {0}" xml:space="preserve"><value>Vybráno: {0}</value></data>
+  <data name="Seller / source" xml:space="preserve"><value>Prodejce / zdroj</value></data>
+  <data name="Send" xml:space="preserve"><value>Odeslat</value></data>
+  <data name="Send interest" xml:space="preserve"><value>Odeslat zájem</value></data>
+  <data name="Send message" xml:space="preserve"><value>Odeslat zprávu</value></data>
+  <data name="Send question" xml:space="preserve"><value>Odeslat dotaz</value></data>
+  <data name="Separate paragraphs with an empty line. When left empty, the page shows the intro text." xml:space="preserve"><value>Odstavce oddělte prázdným řádkem. Když zůstane prázdné, stránka ukáže úvodní text.</value></data>
+  <data name="Show in the public collection" xml:space="preserve"><value>Zobrazit ve veřejné sbírce</value></data>
+  <data name="Show inquiries" xml:space="preserve"><value>Zobrazit poptávky</value></data>
+  <data name="Show offers" xml:space="preserve"><value>Zobrazit nabídky</value></data>
+  <data name="Show on the website" xml:space="preserve"><value>Zobrazit na webu</value></data>
+  <data name="Sign in" xml:space="preserve"><value>Přihlášení</value></data>
+  <data name="Sign in [button]" xml:space="preserve"><value>Přihlásit se</value></data>
+  <data name="Sign in to the administration" xml:space="preserve"><value>Přihlášení do administrace</value></data>
+  <data name="Similar pieces" xml:space="preserve"><value>Podobné kusy</value></data>
+  <data name="Skip to content" xml:space="preserve"><value>Přeskočit na obsah</value></data>
+  <data name="Sold" xml:space="preserve"><value>Prodáno</value></data>
+  <data name="Sold [items]" xml:space="preserve"><value>Prodané</value></data>
+  <data name="Sold [listing]" xml:space="preserve"><value>Prodaná</value></data>
+  <data name="sold for {0}" xml:space="preserve"><value>prodáno za {0}</value></data>
+  <data name="Sorting" xml:space="preserve"><value>Řazení</value></data>
+  <data name="Status" xml:space="preserve"><value>Stav</value></data>
+  <data name="Stay signed in" xml:space="preserve"><value>Zůstat přihlášen</value></data>
+  <data name="Take a photo" xml:space="preserve"><value>Vyfotit</value></data>
+  <data name="Text of the About the collection page" xml:space="preserve"><value>Text stránky O sbírce</value></data>
+  <data name="Text on the contact page" xml:space="preserve"><value>Text na stránce kontaktu</value></data>
+  <data name="Texts and contacts of the public website. Changes take effect right after saving." xml:space="preserve"><value>Texty a kontakty veřejného webu. Změny se projeví hned po uložení.</value></data>
+  <data name="Texts of the application" xml:space="preserve"><value>Texty aplikace</value></data>
+  <data name="Thank you, the message has been sent" xml:space="preserve"><value>Děkujeme, zpráva je odeslaná</value></data>
+  <data name="The action failed. Please try again; if the problem persists, reload the page." xml:space="preserve"><value>Akce se nepovedla. Zkuste to prosím znovu; pokud chyba trvá, obnovte stránku.</value></data>
+  <data name="The category will be removed from: {0}." xml:space="preserve"><value>Kategorie se odebere z: {0}.</value></data>
+  <data name="The change of photos could not be saved. Showing the saved state." xml:space="preserve"><value>Změnu fotek se nepovedlo uložit. Zobrazuji uložený stav.</value></data>
+  <data name="The collection is being prepared – the first pieces will appear here soon." xml:space="preserve"><value>Sbírku právě připravujeme – brzy zde najdete první kusy.</value></data>
+  <data name="The collection is being prepared." xml:space="preserve"><value>Sbírku právě připravujeme.</value></data>
+  <data name="The color must be in the format #RRGGBB." xml:space="preserve"><value>Barva musí být ve tvaru #RRGGBB.</value></data>
+  <data name="The contacts will be publicly visible on the website. Do not enter a home address or other sensitive data." xml:space="preserve"><value>Kontakty budou na webu veřejně vidět. Adresu bydliště ani jiné citlivé údaje neuvádějte.</value></data>
+  <data name="The controller of personal data is the operator of the website {0} (a private person)." xml:space="preserve"><value>Správcem osobních údajů je provozovatel webu {0} (soukromá osoba).</value></data>
+  <data name="The default language cannot be deleted – make another language the default one first." xml:space="preserve"><value>Výchozí jazyk nejde smazat – nejdřív nastavte jako výchozí jiný jazyk.</value></data>
+  <data name="The default language is at the root of the website (/), other languages have their code in the address (e.g. /en/)." xml:space="preserve"><value>Výchozí jazyk je v kořeni webu (/), ostatní jazyky mají v adrese svůj kód (např. /en/).</value></data>
+  <data name="The description can have at most {1} characters." xml:space="preserve"><value>Popis může mít nejvýše {1} znaků.</value></data>
+  <data name="The e-mail can have at most {1} characters." xml:space="preserve"><value>E-mail může mít nejvýše {1} znaků.</value></data>
+  <data name="The e-mail is too long." xml:space="preserve"><value>E-mail je příliš dlouhý.</value></data>
+  <data name="The entry no longer exists." xml:space="preserve"><value>Položka už neexistuje.</value></data>
+  <data name="The form contains errors" xml:space="preserve"><value>Formulář obsahuje chyby</value></data>
+  <data name="The form will have the field „Your price offer“." xml:space="preserve"><value>Ve formuláři bude pole „Vaše nabídka ceny“.</value></data>
+  <data name="The headline can have at most {1} characters." xml:space="preserve"><value>Nadpis může mít nejvýše {1} znaků.</value></data>
+  <data name="The intro can have at most {1} characters." xml:space="preserve"><value>Úvodní text může mít nejvýše {1} znaků.</value></data>
+  <data name="The item already has an open offer (created in another tab). Reload the page." xml:space="preserve"><value>Předmět už má otevřenou nabídku (založenou v jiné záložce). Načtěte stránku znovu.</value></data>
+  <data name="The item details have no unsaved changes" xml:space="preserve"><value>Údaje předmětu nemají neuložené změny</value></data>
+  <data name="The item is not in the public collection" xml:space="preserve"><value>Předmět není ve veřejné sbírce</value></data>
+  <data name="The item is not in the public collection – on the website it will be visible only in the offers (photos marked as public)." xml:space="preserve"><value>Předmět není ve veřejné sbírce – na webu bude vidět jen v nabídce (fotky označené jako veřejné).</value></data>
+  <data name="The item is not on offer." xml:space="preserve"><value>Předmět není v nabídce.</value></data>
+  <data name="The language no longer exists." xml:space="preserve"><value>Jazyk už neexistuje.</value></data>
+  <data name="The message can have at most 4,000 characters." xml:space="preserve"><value>Zpráva může mít nejvýše 4 000 znaků.</value></data>
+  <data name="The name can have at most 200 characters." xml:space="preserve"><value>Jméno může mít nejvýše 200 znaků.</value></data>
+  <data name="The name can have at most {0} characters." xml:space="preserve"><value>Název může mít nejvýše {0} znaků.</value></data>
+  <data name="The name can have at most {1} characters." xml:space="preserve"><value>Název může mít nejvýše {1} znaků.</value></data>
+  <data name="The name in the default language is shown" xml:space="preserve"><value>Zobrazí se název ve výchozím jazyce</value></data>
+  <data name="The note can have at most {1} characters." xml:space="preserve"><value>Poznámka může mít nejvýše {1} znaků.</value></data>
+  <data name="The notes can have at most {1} characters." xml:space="preserve"><value>Poznámky mohou mít nejvýše {1} znaků.</value></data>
+  <data name="The offer was changed meanwhile by someone else (or another tab). Reload the page." xml:space="preserve"><value>Nabídku mezitím změnil někdo jiný (nebo jiná záložka). Načtěte stránku znovu.</value></data>
+  <data name="The offer was closed as sold." xml:space="preserve"><value>Nabídka uzavřena jako prodaná.</value></data>
+  <data name="The offer was withdrawn." xml:space="preserve"><value>Nabídka stažena.</value></data>
+  <data name="The page does not exist, or the item is no longer in the public collection." xml:space="preserve"><value>Hledaná stránka neexistuje, nebo předmět už není ve veřejné sbírce.</value></data>
+  <data name="The password must have at least {0} characters." xml:space="preserve"><value>Heslo musí mít alespoň {0} znaků.</value></data>
+  <data name="The password was changed." xml:space="preserve"><value>Heslo bylo změněno.</value></data>
+  <data name="The passwords do not match." xml:space="preserve"><value>Hesla se neshodují.</value></data>
+  <data name="The phone can have at most 50 characters." xml:space="preserve"><value>Telefon může mít nejvýše 50 znaků.</value></data>
+  <data name="The phone can have at most {1} characters." xml:space="preserve"><value>Telefon může mít nejvýše {1} znaků.</value></data>
+  <data name="The price cannot be negative." xml:space="preserve"><value>Cena nemůže být záporná.</value></data>
+  <data name="The provenance can have at most {1} characters." xml:space="preserve"><value>Provenience může mít nejvýše {1} znaků.</value></data>
+  <data name="The sale date cannot be earlier than the purchase date." xml:space="preserve"><value>Datum prodeje nemůže být dřív než datum nákupu.</value></data>
+  <data name="The seller can have at most {1} characters." xml:space="preserve"><value>Prodejce může mít nejvýše {1} znaků.</value></data>
+  <data name="The text can have at most {1} characters." xml:space="preserve"><value>Text může mít nejvýše {1} znaků.</value></data>
+  <data name="the text of the message, optionally a proposed price," xml:space="preserve"><value>text zprávy, případně navrženou cenu,</value></data>
+  <data name="The texts of the application are written in English" xml:space="preserve"><value>Texty aplikace jsou napsané anglicky</value></data>
+  <data name="The user name „{0}“ contains characters that are not allowed." xml:space="preserve"><value>Uživatelské jméno „{0}“ obsahuje nepovolené znaky.</value></data>
+  <data name="The value is not valid." xml:space="preserve"><value>Neplatná hodnota.</value></data>
+  <data name="The website shows that the piece can also be traded." xml:space="preserve"><value>Na webu se zobrazí, že kus lze i vyměnit.</value></data>
+  <data name="The website uses only one technically necessary cookie, which protects the forms from abuse (protection against request forgery). It contains no personal data and is deleted when the browser closes. The website uses no tracking, analytics or advertising cookies, so we do not ask for your cookie consent." xml:space="preserve"><value>Web používá jen jednu technicky nezbytnou cookie, která chrání formuláře před zneužitím (ochrana proti podvržení požadavku). Neobsahuje žádné osobní údaje a smaže se po zavření prohlížeče. Sledovací, analytické ani reklamní cookies web nepoužívá, proto po vás nežádáme souhlas s cookies.</value></data>
+  <data name="The year of discontinuation cannot be earlier than the year of introduction." xml:space="preserve"><value>Rok zrušení nemůže být dřív než rok zavedení.</value></data>
+  <data name="This piece is for sale" xml:space="preserve"><value>Tento kus je na prodej</value></data>
+  <data name="to" xml:space="preserve"><value>do</value></data>
+  <data name="To handle" xml:space="preserve"><value>K vyřízení</value></data>
+  <data name="to {0}" xml:space="preserve"><value>do {0}</value></data>
+  <data name="Too many failed attempts. Try again in 15 minutes." xml:space="preserve"><value>Příliš mnoho neúspěšných pokusů. Zkuste to znovu za 15 minut.</value></data>
+  <data name="Too many failed sign-in attempts. Try again in {0} minutes." xml:space="preserve"><value>Příliš mnoho neúspěšných pokusů o přihlášení. Zkuste to znovu za {0} minut.</value></data>
+  <data name="Trade possible" xml:space="preserve"><value>Možná výměna</value></data>
+  <data name="Translatable – edited in the selected language" xml:space="preserve"><value>Překládá se – upravuje se ve zvoleném jazyce</value></data>
+  <data name="Translation: an empty field shows the text in {0}." xml:space="preserve"><value>Překlad: prázdné pole zobrazí text v jazyce {0}.</value></data>
+  <data name="Try changing or" xml:space="preserve"><value>Zkuste upravit nebo</value></data>
+  <data name="Try changing the search or the filters." xml:space="preserve"><value>Zkuste upravit hledání nebo filtry.</value></data>
+  <data name="Type" xml:space="preserve"><value>Typ</value></data>
+  <data name="Unfortunately, this piece is no longer available." xml:space="preserve"><value>Tento kus už bohužel není k dispozici.</value></data>
+  <data name="Unsaved" xml:space="preserve"><value>Neuloženo</value></data>
+  <data name="Unsaved changes" xml:space="preserve"><value>Neuložené změny</value></data>
+  <data name="unused" xml:space="preserve"><value>nepoužito</value></data>
+  <data name="User name" xml:space="preserve"><value>Uživatelské jméno</value></data>
+  <data name="User {0} already exists." xml:space="preserve"><value>Uživatel {0} už existuje.</value></data>
+  <data name="View the offer" xml:space="preserve"><value>Zobrazit nabídku</value></data>
+  <data name="View website" xml:space="preserve"><value>Zobrazit web</value></data>
+  <data name="Visibility" xml:space="preserve"><value>Viditelnost</value></data>
+  <data name="Visitors see the name, description, public photos and basic details – never prices or private notes." xml:space="preserve"><value>Návštěvníci uvidí název, popis, veřejné fotky a základní údaje – nikdy ceny ani soukromé poznámky.</value></data>
+  <data name="We found nothing" xml:space="preserve"><value>Nic jsme nenašli</value></data>
+  <data name="We process the data based on your consent, which you give by sending the form. Handled messages are deleted automatically after 12 months, earlier at your request." xml:space="preserve"><value>Údaje zpracováváme na základě vašeho souhlasu, který udělujete odesláním formuláře. Vyřízené zprávy automaticky mažeme po 12 měsících, dříve na vaši žádost.</value></data>
+  <data name="We use the data only to reply to you and possibly arrange a sale or exchange. We do not share it with anyone or use it for marketing." xml:space="preserve"><value>Údaje používáme jen k tomu, abychom vám odpověděli a případně domluvili prodej nebo výměnu. Nikomu je nepředáváme a nepoužíváme je k marketingu.</value></data>
+  <data name="We will get back to you by e-mail, usually within a few days." xml:space="preserve"><value>Ozveme se vám e-mailem, obvykle do několika dnů.</value></data>
+  <data name="We will reply by e-mail." xml:space="preserve"><value>Odpovíme vám e-mailem.</value></data>
+  <data name="We will reply by e-mail. If you are interested in buying, say so right in the message." xml:space="preserve"><value>Odpovíme vám e-mailem. Pokud vás zajímá koupě, napište to rovnou do zprávy.</value></data>
+  <data name="Website by" xml:space="preserve"><value>Autor webu</value></data>
+  <data name="Website name" xml:space="preserve"><value>Název webu</value></data>
+  <data name="Website settings" xml:space="preserve"><value>Nastavení webu</value></data>
+  <data name="Website settings – administration" xml:space="preserve"><value>Nastavení webu – administrace</value></data>
+  <data name="What data and why" xml:space="preserve"><value>Jaké údaje a proč</value></data>
+  <data name="What it sold for" xml:space="preserve"><value>Za kolik se prodalo</value></data>
+  <data name="When you send us a question or a reply to an offer, we store:" xml:space="preserve"><value>Když nám pošlete dotaz nebo reakci na nabídku, uložíme:</value></data>
+  <data name="Where the piece comes from, its story, interesting facts…" xml:space="preserve"><value>Odkud kus pochází, jeho příběh, zajímavosti…</value></data>
+  <data name="which piece or offer the message refers to and when you sent it." xml:space="preserve"><value>ke kterému kusu nebo nabídce se zpráva vztahuje a kdy jste ji odeslali.</value></data>
+  <data name="Who processes the data" xml:space="preserve"><value>Kdo údaje zpracovává</value></data>
+  <data name="Whole collection" xml:space="preserve"><value>Celá sbírka</value></data>
+  <data name="Whole offer ({0})" xml:space="preserve"><value>Celá nabídka ({0})</value></data>
+  <data name="With photos" xml:space="preserve"><value>S fotkami</value></data>
+  <data name="Withdrawn [listing]" xml:space="preserve"><value>Stažená</value></data>
+  <data name="Without photos" xml:space="preserve"><value>Bez fotek</value></data>
+  <data name="Write a question" xml:space="preserve"><value>Napsat dotaz</value></data>
+  <data name="Write to us" xml:space="preserve"><value>Napište nám</value></data>
+  <data name="Write what you are contacting us about." xml:space="preserve"><value>Napište, s čím se na nás obracíte.</value></data>
+  <data name="year" xml:space="preserve"><value>rok</value></data>
+  <data name="Year from" xml:space="preserve"><value>Rok od</value></data>
+  <data name="Year to" xml:space="preserve"><value>Rok do</value></data>
+  <data name="yesterday" xml:space="preserve"><value>včera</value></data>
+  <data name="You can ask about a piece from the collection directly on its page." xml:space="preserve"><value>Na kus ze sbírky se můžete zeptat přímo na jeho stránce.</value></data>
+  <data name="You can contact us at" xml:space="preserve"><value>Kontaktovat nás můžete na</value></data>
+  <data name="You can contact us via the" xml:space="preserve"><value>Kontaktovat nás můžete přes</value></data>
+  <data name="You can propose a price" xml:space="preserve"><value>Můžete navrhnout cenu</value></data>
+  <data name="You have sent too many messages in a short time. Please try again later." xml:space="preserve"><value>Odeslali jste v krátké době příliš mnoho zpráv. Zkuste to prosím později.</value></data>
+  <data name="You have the right to access your data, have it corrected or erased, restrict its processing, and withdraw your consent at any time – just write to us. If you believe we process the data in breach of the law, you can turn to the Office for Personal Data Protection (uoou.gov.cz)." xml:space="preserve"><value>Máte právo na přístup ke svým údajům, jejich opravu nebo výmaz, omezení zpracování a právo souhlas kdykoli odvolat – stačí nám napsat. Pokud máte za to, že údaje zpracováváme v rozporu s předpisy, můžete se obrátit na Úřad pro ochranu osobních údajů (uoou.gov.cz).</value></data>
+  <data name="You have unsaved changes. Leave without saving?" xml:space="preserve"><value>Máte neuložené změny. Opravdu odejít bez uložení?</value></data>
+  <data name="You might be interested in" xml:space="preserve"><value>Mohlo by vás zajímat</value></data>
+  <data name="You will find pieces for sale in the" xml:space="preserve"><value>Kusy na prodej najdete v</value></data>
+  <data name="your name, e-mail and optionally phone," xml:space="preserve"><value>jméno, e-mail a případně telefon,</value></data>
+  <data name="Your price offer" xml:space="preserve"><value>Vaše nabídka ceny</value></data>
+  <data name="Your question" xml:space="preserve"><value>Váš dotaz</value></data>
+  <data name="Your rights" xml:space="preserve"><value>Vaše práva</value></data>
+  <data name="{0} item will have no country.|{0} items will have no country." xml:space="preserve"><value>{0} předmět zůstane bez země.|{0} předměty zůstane bez země.|{0} předmětů zůstane bez země.</value></data>
+  <data name="{0} item will have no type.|{0} items will have no type." xml:space="preserve"><value>{0} předmět zůstane bez typu.|{0} předměty zůstane bez typu.|{0} předmětů zůstane bez typu.</value></data>
+  <data name="{0} item|{0} items" xml:space="preserve"><value>{0} předmět|{0} předměty|{0} předmětů</value></data>
+  <data name="{0} new" xml:space="preserve"><value>{0} nové</value></data>
+  <data name="{0} photo|{0} photos" xml:space="preserve"><value>{0} fotka|{0} fotky|{0} fotek</value></data>
+  <data name="{0} piece|{0} pieces" xml:space="preserve"><value>{0} kus|{0} kusy|{0} kusů</value></data>
+  <data name="{0} public" xml:space="preserve"><value>{0} veřejných</value></data>
+  <data name="{0} – administration" xml:space="preserve"><value>{0} – administrace</value></data>
+  <data name="{0} – offer" xml:space="preserve"><value>{0} – nabídka</value></data>
+  <data name="{0}: the file is larger than {1} MB." xml:space="preserve"><value>{0}: soubor je větší než {1} MB.</value></data>
+  <data name="{0}: the upload failed, please try again." xml:space="preserve"><value>{0}: nahrání se nepovedlo, zkuste to znovu.</value></data>
+  <data name="{0}: unsupported or damaged image." xml:space="preserve"><value>{0}: nepodporovaný nebo poškozený obrázek.</value></data>
+  <data name="„{0}“ already exists." xml:space="preserve"><value>„{0}“ už existuje.</value></data>
+  <data name="„{0}“ is not a known language code." xml:space="preserve"><value>„{0}“ není známý kód jazyka.</value></data>
+  <data name="Enter a valid amount." xml:space="preserve"><value>Zadejte platnou částku.</value></data>
+</root>

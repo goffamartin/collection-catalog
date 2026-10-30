@@ -1,0 +1,318 @@
+@page "/admin/poptavky"
+@rendermode InteractiveServer
+@using System.Globalization
+@inject InquiryService InquiryService
+@inject NavigationManager Navigation
+@inject ILogger<Inquiries> Logger
+
+<PageTitle>@T["Inquiries – administration"]</PageTitle>
+
+<PageHeader Title="@T["Inquiries"]">
+    <Description>@T["Questions and replies to offers from the website. Reply by e-mail; mark the status here to keep track of what is done."]</Description>
+</PageHeader>
+
+<div class="mb-4 flex flex-wrap items-center gap-3">
+    <FilterTabs TValue="InquiryBox" Options="BoxOptions" Selected="_filter.Box" OnSelect="box => Go(box: box, id: null)" Label="@T["Show inquiries"]" />
+    @if (_filter.ItemId is not null || _filter.ListingId is not null)
+    {
+        <button type="button" class="btn-ghost btn-sm" @onclick="ClearScope">
+            <span class="icon-[lucide--x] size-3.5"></span> @(_filter.ListingId is not null ? T["Only this offer – clear"] : T["Only this item – clear"])
+        </button>
+    }
+</div>
+
+<div class="grid gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
+    @* List – hidden on mobile while a detail is open. *@
+    <div class="@($"card self-start overflow-hidden {(_detail is not null ? "hidden lg:block" : "")}")">
+        @if (_rows is null)
+        {
+            <div class="card-body text-sm text-stone-500"><span class="icon-[lucide--loader-circle] size-4 animate-spin align-[-3px]"></span> @T["Loading…"]</div>
+        }
+        else if (_rows.Count == 0)
+        {
+            <div class="flex flex-col items-center px-4 py-14 text-center">
+                <span class="icon-[lucide--inbox] size-10 text-stone-300"></span>
+                <p class="mt-3 font-medium text-stone-900">@(_filter.Box == InquiryBox.Open ? T["Nothing waiting to be handled"] : T["No inquiries"])</p>
+                <p class="mt-1 text-sm text-stone-500">@T["New questions from the website appear here."]</p>
+            </div>
+        }
+        else
+        {
+            <ul class="divide-y divide-stone-100">
+                @foreach (var row in _rows)
+                {
+                    <li>
+                        <button type="button" @onclick="() => Go(id: row.Id)"
+                                class="@($"flex w-full gap-3 px-4 py-3 text-left transition hover:bg-amber-50/40 {(row.Id == _detail?.Id ? "bg-amber-50/70" : "")}")">
+                            <span class="@($"mt-1.5 size-2 shrink-0 rounded-full {(row.Status == InquiryStatus.New ? "bg-amber-500" : "bg-transparent")}")"></span>
+                            <span class="min-w-0 flex-1">
+                                <span class="flex items-baseline justify-between gap-2">
+                                    <span class="@($"truncate text-sm {(row.Status == InquiryStatus.New ? "font-semibold text-stone-900" : "font-medium text-stone-700")}")">@row.Name</span>
+                                    <span class="shrink-0 text-xs text-stone-500">@Ago(row.CreatedAt)</span>
+                                </span>
+                                <span class="mt-0.5 block truncate text-xs text-stone-500">
+                                    @if (row.ListingId is not null)
+                                    {
+                                        <span class="icon-[lucide--tag] size-3 align-[-2px] text-amber-600"></span>
+                                    }
+                                    @(row.ItemName ?? T["General question"])
+                                    @if (row.OfferedPrice is { } price)
+                                    {
+                                        <span class="font-medium text-stone-700"> · @T["offers {0}", Format.Money(price)]</span>
+                                    }
+                                </span>
+                                <span class="mt-1 line-clamp-2 block text-sm text-stone-600">@row.Message</span>
+                            </span>
+                        </button>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+
+    <div>
+        @if (_detail is null)
+        {
+            <div class="card hidden flex-col items-center px-4 py-20 text-center lg:flex">
+                <span class="icon-[lucide--mail-open] size-10 text-stone-300"></span>
+                <p class="mt-3 text-sm text-stone-500">@T["Select an inquiry on the left."]</p>
+            </div>
+        }
+        else
+        {
+            var d = _detail;
+            @if (_error is not null)
+            {
+                <div class="mb-4 flex gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200" role="alert">
+                    <span class="icon-[lucide--circle-alert] mt-0.5 size-4 shrink-0"></span> @_error
+                </div>
+            }
+            <article class="card">
+                <div class="card-header flex-wrap">
+                    <div class="min-w-0">
+                        <button type="button" class="btn-ghost btn-sm -ml-2 mb-1 lg:hidden" @onclick="() => Go(id: null)">
+                            <span class="icon-[lucide--arrow-left] size-3.5"></span> @T["Back to the list"]
+                        </button>
+                        <p class="text-xs font-medium tracking-wide text-amber-700 uppercase">@d.Kind</p>
+                        <h2 class="mt-0.5 text-lg font-semibold text-stone-900">@d.Name</h2>
+                        <p class="text-xs text-stone-500">@AppTime.ToLocal(d.CreatedAt).ToString(T["M/d/yyyy h:mm tt"], CultureInfo.CurrentCulture)</p>
+                    </div>
+                    <span class="@($"badge {StatusClass(d.Status)}")">@d.Status.Label()</span>
+                </div>
+
+                <div class="card-body space-y-5">
+                    <div class="flex flex-wrap gap-2">
+                        @if (MailTo(d) is { } mailTo)
+                        {
+                            <a href="@mailTo" class="btn-primary"><span class="icon-[lucide--reply] size-4"></span> @T["Reply by e-mail"]</a>
+                        }
+                        @if (d.Phone is { } phone)
+                        {
+                            <a href="@PhoneNumber.TelUri(phone)" class="btn-secondary"><span class="icon-[lucide--phone] size-4"></span> @phone</a>
+                        }
+                    </div>
+
+                    <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                        <div>
+                            <dt class="text-stone-500">@T["E-mail"]</dt>
+                            <dd class="font-medium break-all text-stone-900">@d.Email</dd>
+                        </div>
+                        @if (d.ItemId is { } itemId)
+                        {
+                            <div>
+                                <dt class="text-stone-500">@(d.ListingId is not null ? T["Offer"] : T["Item"])</dt>
+                                <dd><a href="@AdminUrls.Item(itemId)" class="font-medium text-amber-700 hover:underline">@d.ItemName</a></dd>
+                            </div>
+                        }
+                        @if (d.ListingId is not null)
+                        {
+                            <div>
+                                <dt class="text-stone-500">@T["Asking price"]</dt>
+                                <dd class="font-medium text-stone-900">@(d.AskingPrice is null ? T["on request"] : Format.Money(d.AskingPrice)) @(d.ListingStatus is { } ls ? $"· {ls.Label().ToLower(CultureInfo.CurrentCulture)}" : "")</dd>
+                            </div>
+                        }
+                        @if (d.OfferedPrice is { } offered)
+                        {
+                            <div>
+                                <dt class="text-stone-500">@AppText.In("price", "Offers")</dt>
+                                <dd class="text-base font-semibold text-emerald-700">@Format.Money(offered)</dd>
+                            </div>
+                        }
+                    </dl>
+
+                    <div class="rounded-xl bg-stone-50 p-4 text-sm leading-relaxed whitespace-pre-line text-stone-800 ring-1 ring-stone-200">@d.Message</div>
+
+                    <div>
+                        <p class="form-label">@T["Status"]</p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (var status in _manualStatuses)
+                            {
+                                <button type="button" @onclick="() => SetStatusAsync(status)"
+                                        class="@($"btn btn-sm ring-1 ring-inset {(d.Status == status ? "bg-stone-900 text-white ring-stone-900" : "bg-white text-stone-700 ring-stone-300 hover:bg-stone-50")}")">@status.Label()</button>
+                            }
+                        </div>
+                        <p class="form-hint">@T["Handled ones (replied, accepted, declined, archived) are deleted automatically after a year."]</p>
+                    </div>
+
+                    <div>
+                        <label for="inquiry-note" class="form-label">@T["Internal note"]</label>
+                        <textarea id="inquiry-note" rows="3" class="form-input" maxlength="@Inquiry.MaxNoteLength" placeholder="@T["Just for you – the visitor will not see it."]"
+                                  @bind="_note" @bind:event="oninput" @bind:after="() => _noteDirty = true"></textarea>
+                        <div class="mt-2 flex items-center gap-3">
+                            <button type="button" class="btn-secondary btn-sm" disabled="@(!_noteDirty)" @onclick="SaveNoteAsync">@T["Save note"]</button>
+                            @if (_noteSaved)
+                            {
+                                <span class="text-xs font-medium text-emerald-700">@T["Saved"]</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 border-t border-stone-100 px-5 py-3">
+                    @if (_confirmDelete)
+                    {
+                        <span class="text-sm text-stone-600">@T["Delete the inquiry including the personal data?"]</span>
+                        <button type="button" class="btn-secondary btn-sm" @onclick="() => _confirmDelete = false">@T["No"]</button>
+                        <button type="button" class="btn-danger-solid btn-sm" @onclick="DeleteAsync">@T["Delete"]</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn-danger btn-sm" @onclick="() => _confirmDelete = true"><span class="icon-[lucide--trash-2] size-3.5"></span> @T["Delete"]</button>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+</div>
+
+@code {
+    private (InquiryBox, string)[] BoxOptions => [(InquiryBox.Open, T["To handle"]), (InquiryBox.Closed, T["Handled"]), (InquiryBox.All, T["All"])];
+    private static readonly InquiryStatus[] _manualStatuses = [InquiryStatus.Read, InquiryStatus.Replied, InquiryStatus.Accepted, InquiryStatus.Declined, InquiryStatus.Archived];
+
+    private InquiryFilter _filter = new();
+    private List<InquiryRow>? _rows;
+    private InquiryDetail? _detail;
+    private string? _note;
+    private bool _noteDirty;
+    private bool _noteSaved;
+    private bool _confirmDelete;
+    private string? _error;
+
+    [SupplyParameterFromQuery(Name = "schranka")] public string? QueryBox { get; set; }
+    [SupplyParameterFromQuery(Name = "predmet")] public string? QueryItem { get; set; }
+    [SupplyParameterFromQuery(Name = "nabidka")] public string? QueryListing { get; set; }
+    [SupplyParameterFromQuery(Name = "id")] public string? QueryId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var filter = new InquiryFilter
+        {
+            Box = QueryBox switch { "vyrizene" => InquiryBox.Closed, "vse" => InquiryBox.All, _ => InquiryBox.Open },
+            ItemId = QueryValue.Int(QueryItem),
+            ListingId = QueryValue.Int(QueryListing),
+        };
+        // From a specific offer / item we want to see all its inquiries, not just the open ones.
+        if ((filter.ItemId is not null || filter.ListingId is not null) && QueryBox is null)
+        {
+            filter = filter with { Box = InquiryBox.All };
+        }
+
+        var detailId = QueryValue.Int(QueryId);
+        if (_detail?.Id != detailId)
+        {
+            _detail = detailId is { } id ? await InquiryService.OpenAsync(id) : null;
+            _note = _detail?.InternalNote;
+            _noteDirty = _noteSaved = _confirmDelete = false;
+            _error = null;
+        }
+
+        // Opening a new inquiry changes its status → load the list only after that.
+        _filter = filter;
+        _rows = await InquiryService.GetInboxAsync(_filter);
+    }
+
+    private void Go(InquiryBox? box = null, int? id = null)
+    {
+        var targetBox = box ?? _filter.Box;
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["schranka"] = targetBox switch { InquiryBox.Closed => "vyrizene", InquiryBox.All => "vse", _ => null },
+            ["id"] = id,
+        }), replace: true);
+    }
+
+    private void ClearScope() => Navigation.NavigateTo(AdminUrls.Inquiries, replace: true);
+
+    private async Task SetStatusAsync(InquiryStatus status)
+    {
+        _error = null;
+        if (!await SafeAction.RunAsync(Logger, "changing the status of an inquiry", () => InquiryService.SetStatusAsync(_detail!.Id, status)))
+        {
+            _error = SafeAction.Message;
+            return;
+        }
+        _detail!.Status = status;
+        _rows = await InquiryService.GetInboxAsync(_filter);
+    }
+
+    private async Task SaveNoteAsync()
+    {
+        _error = null;
+        if (!await SafeAction.RunAsync(Logger, "saving a note to an inquiry", () => InquiryService.SaveNoteAsync(_detail!.Id, _note)))
+        {
+            _error = SafeAction.Message;
+            return;
+        }
+        _detail!.InternalNote = _note;
+        _noteDirty = false;
+        _noteSaved = true;
+    }
+
+    private async Task DeleteAsync()
+    {
+        _error = null;
+        if (!await SafeAction.RunAsync(Logger, "deleting an inquiry", () => InquiryService.DeleteAsync(_detail!.Id)))
+        {
+            _confirmDelete = false;
+            _error = SafeAction.Message;
+            return;
+        }
+        _detail = null;
+        Go(id: null);
+    }
+
+    /// <summary>Link to reply; none for an address failing the check (older data) – it could forge the recipient.</summary>
+    private string? MailTo(InquiryDetail d)
+    {
+        if (!StrictEmailAttribute.IsValid(d.Email))
+        {
+            return null;
+        }
+
+        var subject = d.ItemName is null ? $"Re: {T["Your question"]}" : $"Re: {d.ItemName}";
+        var quote = string.Join("\n", d.Message.Split('\n').Select(line => "> " + line.TrimEnd('\r')));
+        var body = T["Hello,\n\n\n\n---\n{0} wrote on {1}:\n{2}", d.Name, AppTime.ToLocal(d.CreatedAt).ToString(T["M/d/yyyy"], CultureInfo.CurrentCulture), quote].Value;
+        return $"mailto:{d.Email}?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(body)}";
+    }
+
+    private string Ago(DateTime utc)
+    {
+        var local = AppTime.ToLocal(utc);
+        var today = AppTime.LocalNow(TimeProvider.System).Date;
+        var culture = CultureInfo.CurrentCulture;
+        return local.Date == today ? local.ToString(T["h:mm tt"], culture)
+            : local.Date == today.AddDays(-1) ? T["yesterday"]
+            : local.Year == today.Year ? local.ToString(T["M/d"], culture)
+            : local.ToString(T["M/d/yyyy"], culture);
+    }
+
+    public static string StatusClass(InquiryStatus status) => status switch
+    {
+        InquiryStatus.New => "bg-amber-500 text-white",
+        InquiryStatus.Read => "bg-sky-50 text-sky-700 ring-1 ring-sky-600/15",
+        InquiryStatus.Replied => "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/15",
+        InquiryStatus.Accepted => "bg-emerald-600 text-white",
+        InquiryStatus.Declined => "bg-stone-100 text-stone-600",
+        _ => "bg-stone-100 text-stone-500",
+    };
+}

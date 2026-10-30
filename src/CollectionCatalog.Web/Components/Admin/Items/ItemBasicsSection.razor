@@ -1,0 +1,76 @@
+@* Name, type, country, period and categories. Part of the item editor form (EditContext comes from the EditForm). *@
+<section class="card">
+    <div class="card-header"><h2 class="card-title"><span class="icon-[lucide--gem] size-4 text-amber-600"></span> @T["Basic details"]</h2></div>
+    <div class="card-body grid gap-5 sm:grid-cols-6">
+        <div class="sm:col-span-6">
+            <label for="name" class="form-label">@T["Name"]<LanguageMark Code="@Model.EditLanguage" /></label>
+            <InputText id="name" @bind-Value="Model.Name" class="form-input text-base font-medium"
+                       placeholder="@(Model.Fallback(Model.NameText) ?? T["e.g. Amethyst geode from Brazil"])" />
+            <ValidationMessage For="() => Model.Name" />
+        </div>
+        <div class="sm:col-span-6">
+            <label for="type" class="form-label">@T["Type"]</label>
+            <InputSelect id="type" @bind-Value="Model.TypeId" class="form-input">
+                <option value="">—</option>
+                @foreach (var type in Lookups.Types)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="sm:col-span-2">
+            <label for="country" class="form-label">@T["Country"]</label>
+            <InputSelect id="country" @bind-Value="Model.CountryId" class="form-input">
+                <option value="">—</option>
+                @foreach (var country in Lookups.Countries)
+                {
+                    <option value="@country.Id">@country.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="sm:col-span-2">
+            <label for="year-from" class="form-label">@T["Year from"]</label>
+            <InputNumber id="year-from" @bind-Value="Model.YearReleased" class="form-input" placeholder="@T["year"]" />
+            <ValidationMessage For="() => Model.YearReleased" />
+        </div>
+        <div class="sm:col-span-2">
+            <label for="year-to" class="form-label">@T["Year to"]</label>
+            <InputNumber id="year-to" @bind-Value="Model.YearDiscontinued" class="form-input" placeholder="@T["year"]" />
+            <ValidationMessage For="() => Model.YearDiscontinued" />
+        </div>
+        <div class="sm:col-span-6">
+            <span class="form-label">@T["Categories"]</span>
+            <div class="flex flex-wrap gap-2">
+                @foreach (var category in Lookups.Categories)
+                {
+                    var selected = Model.CategoryIds.Contains(category.Id);
+                    <button type="button" class="badge px-3 py-1.5 text-sm ring-1 transition @(selected ? "" : "bg-white text-stone-500 ring-stone-200 hover:ring-stone-300")"
+                            style="@(selected ? CategoryColors.BadgeStyle(category.Color) : null)"
+                            aria-pressed="@(selected ? "true" : "false")" @onclick="() => ToggleCategory(category.Id)">
+                        @if (selected)
+                        {
+                            <span class="icon-[lucide--check] size-3.5"></span>
+                        }
+                        @category.Name
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ItemEditModel Model { get; set; } = null!;
+    [Parameter, EditorRequired] public EditorLookups Lookups { get; set; } = null!;
+    [CascadingParameter] private EditContext EditContext { get; set; } = null!;
+
+    // EditContext does not track the category list – report the change so the editor knows about unsaved changes.
+    private void ToggleCategory(int categoryId)
+    {
+        if (!Model.CategoryIds.Remove(categoryId))
+        {
+            Model.CategoryIds.Add(categoryId);
+        }
+        EditContext.NotifyFieldChanged(FieldIdentifier.Create(() => Model.CategoryIds));
+    }
+}

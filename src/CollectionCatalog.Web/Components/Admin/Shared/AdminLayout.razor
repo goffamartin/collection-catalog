@@ -1,0 +1,74 @@
+@inherits LayoutComponentBase
+
+@* Static layout of the administration; pages choose their interactivity themselves (@rendermode).
+   Desktop: dark sidebar. Mobile: top bar with a menu in a native <details> – no JavaScript. *@
+<a href="#obsah" data-skip-link class="sr-only z-50 rounded-lg bg-white px-4 py-2 text-sm font-medium text-stone-900 shadow-lg ring-2 ring-amber-500 focus:not-sr-only focus:fixed focus:top-3 focus:left-3">@T["Skip to content"]</a>
+<div class="min-h-screen lg:pl-64">
+    <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-stone-950 lg:flex">
+        <div class="flex h-16 items-center gap-3 px-5">
+            <BrandMark />
+        </div>
+
+        <nav class="flex-1 space-y-1 px-3 py-4">
+            <AdminNavLinks />
+        </nav>
+
+        <div class="border-t border-white/10 p-3">
+            <a href="" target="_blank" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-400 transition hover:bg-white/5 hover:text-white">
+                <span class="icon-[lucide--external-link] size-4"></span> @T["Public website"]
+            </a>
+            <AuthorizeView>
+                <a href="@AdminUrls.Account" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-white/5">
+                    <span class="flex size-8 items-center justify-center rounded-full bg-amber-500/15 text-sm font-semibold text-amber-400">
+                        @Initial(context.User.Identity?.Name)
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-medium text-white">@context.User.Identity?.Name</span>
+                        <span class="block text-xs text-stone-500">@T["My account"]</span>
+                    </span>
+                </a>
+            </AuthorizeView>
+            <LogoutButton CssClass="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-400 transition hover:bg-white/5 hover:text-white" />
+            <LanguageSwitcher CssClass="mt-2 px-1" Dark OpenUp AlignLeft />
+        </div>
+    </aside>
+
+    <header class="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-white/10 bg-stone-950 px-4 lg:hidden">
+        <BrandMark />
+        @* Language and menu as two buttons side by side – a dropdown inside the menu would not scale. *@
+        <div class="flex items-center gap-1">
+            <LanguageSwitcher Dark />
+            <details class="relative" data-dropdown>
+                <summary class="flex size-9 cursor-pointer list-none items-center justify-center rounded-lg text-stone-300 hover:bg-white/10" aria-label="@T["Menu"]">
+                    <span class="icon-[lucide--menu] size-5"></span>
+                </summary>
+                <div class="absolute right-0 mt-2 w-64 space-y-1 rounded-xl bg-stone-900 p-2 shadow-xl ring-1 ring-white/10">
+                    <AdminNavLinks />
+                    <div class="my-2 border-t border-white/10"></div>
+                    <a href="@AdminUrls.Account" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/5 hover:text-white">
+                        <span class="icon-[lucide--user-round] size-4"></span> @T["My account"]
+                    </a>
+                    <a href="" target="_blank" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/5 hover:text-white">
+                        <span class="icon-[lucide--external-link] size-4"></span> @T["Public website"]
+                    </a>
+                    <LogoutButton CssClass="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-300 hover:bg-white/5 hover:text-white" />
+                </div>
+            </details>
+        </div>
+    </header>
+
+    <main id="obsah" tabindex="-1" class="mx-auto max-w-7xl focus:outline-none px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    @T["An unexpected error has occurred."]
+    <a href="." class="reload">@T["Reload"]</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private static string Initial(string? name) =>
+        string.IsNullOrEmpty(name) ? "?" : char.ToUpper(name[0], System.Globalization.CultureInfo.CurrentCulture).ToString();
+}

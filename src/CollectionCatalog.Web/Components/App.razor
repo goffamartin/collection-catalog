@@ -1,0 +1,36 @@
+@inject CollectionCatalog.Web.Services.Languages.LanguageService Languages
+
+<!DOCTYPE html>
+<html lang="@Languages.Current.Code">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* With a language prefix (/en/) relative links and the interactive circuit stay in the language. *@
+    <base href="@($"{HttpContext.Request.PathBase}/")" />
+    <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["css/app.css"]" />
+    <link rel="stylesheet" href="@Assets["CollectionCatalog.Web.styles.css"]" />
+    <link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#f7f5f0" />
+    <ImportMap />
+    <link rel="icon" href="favicon.ico" sizes="32x32" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <HeadOutlet />
+</head>
+
+<body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
+    <Routes />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="@Assets["js/site.js"]" defer></script>
+</body>
+
+</html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = null!;
+}

@@ -1,0 +1,16 @@
+@inject SiteSettingsService SiteSettings
+
+@* Logo of the administration – the same mark and name as on the public website. *@
+<a href="admin" class="group flex items-center gap-3">
+    <LogoIcon CssClass="group-hover:ring-amber-400/60" />
+    <span class="leading-tight">
+        <span class="block font-display text-base font-medium text-white">@_siteName</span>
+        <span class="block text-xs text-stone-400">@T["Administration"]</span>
+    </span>
+</a>
+
+@code {
+    private string? _siteName;
+
+    protected override async Task OnInitializedAsync() => _siteName = (await SiteSettings.GetAsync()).SiteName;
+}

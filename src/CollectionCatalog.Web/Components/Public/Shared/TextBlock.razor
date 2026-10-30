@@ -1,0 +1,12 @@
+@* Multi-line text from the administration: paragraphs separated by an empty line, single line breaks are kept. *@
+@foreach (var paragraph in Paragraphs)
+{
+    <p class="whitespace-pre-line">@paragraph</p>
+}
+
+@code {
+    [Parameter] public string? Text { get; set; }
+
+    private IEnumerable<string> Paragraphs =>
+        (Text ?? "").Replace("\r\n", "\n").Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+}

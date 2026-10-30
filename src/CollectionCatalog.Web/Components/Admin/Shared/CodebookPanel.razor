@@ -1,0 +1,239 @@
+@using CollectionCatalog.Web.Services.Codebooks
+@using CollectionCatalog.Web.Services.Text
+@inject CodebookService Codebooks
+@inject LanguageService Languages
+@inject ILogger<CodebookPanel> Logger
+
+@* Management of one codebook: add, rename (categories also color), delete. *@
+<div class="card max-w-3xl">
+    <EditLanguageTabs Value="@_language" ValueChanged="LanguageChangedAsync" CssClass="border-b border-stone-100 p-4" />
+
+    @if (_language != Languages.Default.Code)
+    {
+        <p class="border-b border-stone-100 px-4 py-3 text-sm text-stone-500">
+            @T["New entries are created in the default language ({0}). Here just fill in the translations of the names.", Languages.Default.Name]
+        </p>
+    }
+    else
+    {
+    <form class="flex flex-wrap items-start gap-2 border-b border-stone-100 p-4" @onsubmit="AddAsync" @onsubmit:preventDefault="true">
+        <div class="min-w-48 flex-1">
+            <input class="form-input" placeholder="@NewPlaceholder" maxlength="@CodebookService.MaxNameLength" @bind="_newName" aria-label="@T["New name"]" />
+        </div>
+        @if (HasColor)
+        {
+            <input type="color" class="h-9 w-12 cursor-pointer rounded-lg border-0 bg-white p-1 ring-1 ring-stone-300" @bind="_newColor" aria-label="@T["Color"]" title="@T["Badge color"]" />
+        }
+        <button type="submit" class="btn-primary"><span class="icon-[lucide--plus] size-4"></span> @T["Add"]</button>
+        @if (_addError is not null)
+        {
+            <p class="validation-message w-full">@_addError</p>
+        }
+    </form>
+    }
+
+    @if (_deleteError is not null)
+    {
+        <p class="validation-message border-b border-stone-100 px-4 py-2" role="alert">@_deleteError</p>
+    }
+
+    @if (_entries.Count > 12)
+    {
+        <div class="relative border-b border-stone-100 px-4 py-3">
+            <span class="pointer-events-none absolute inset-y-0 left-7 flex items-center text-stone-400"><span class="icon-[lucide--search] size-4"></span></span>
+            <input type="search" class="form-input pl-9" placeholder="@T["Search…"]" @bind="_search" @bind:event="oninput" aria-label="@T["Search"]" />
+        </div>
+    }
+
+    <ul class="divide-y divide-stone-100">
+        @foreach (var entry in VisibleEntries)
+        {
+            <li @key="entry.Id" class="flex flex-wrap items-center gap-3 px-4 py-3">
+                @if (_editingId == entry.Id)
+                {
+                    <form class="flex flex-1 flex-wrap items-start gap-2" @onsubmit="SaveEditAsync" @onsubmit:preventDefault="true">
+                        <div class="min-w-48 flex-1">
+                            <input class="form-input" maxlength="@CodebookService.MaxNameLength" @bind="_editName" aria-label="@T["Name"]" autofocus
+                                   placeholder="@(_language == Languages.Default.Code ? null : entry.Name)" />
+                        </div>
+                        @if (HasColor)
+                        {
+                            <input type="color" class="h-9 w-12 cursor-pointer rounded-lg border-0 bg-white p-1 ring-1 ring-stone-300" @bind="_editColor" aria-label="@T["Color"]" />
+                        }
+                        <button type="submit" class="btn-primary btn-sm py-2">@T["Save"]</button>
+                        <button type="button" class="btn-ghost btn-sm py-2" @onclick="CancelEdit">@T["Cancel"]</button>
+                        @if (_editError is not null)
+                        {
+                            <p class="validation-message w-full">@_editError</p>
+                        }
+                    </form>
+                }
+                else if (_deletingId == entry.Id)
+                {
+                    <div class="flex flex-1 flex-wrap items-center justify-between gap-2 rounded-lg bg-red-50 px-3 py-2">
+                        <span class="text-sm text-red-800">
+                            @T["Delete"] <strong>@entry.Name</strong>?
+                            @if (entry.ItemCount > 0)
+                            {
+                                <span>@DeleteImpact(entry.ItemCount)</span>
+                            }
+                        </span>
+                        <div class="flex gap-1">
+                            <button type="button" class="btn-ghost btn-sm" @onclick="() => _deletingId = null">@T["No"]</button>
+                            <button type="button" class="btn-danger-solid btn-sm" @onclick="() => DeleteAsync(entry)">@T["Delete"]</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                        @if (HasColor)
+                        {
+                            <span class="badge px-2.5 py-1 text-sm ring-1" style="@CategoryColors.BadgeStyle(entry.Color)">@entry.Name</span>
+                        }
+                        else
+                        {
+                            <span class="truncate text-sm font-medium text-stone-900">@entry.Name</span>
+                        }
+                        @if (entry.Translation is null)
+                        {
+                            <span class="badge bg-sky-50 text-sky-700 ring-1 ring-sky-600/20" title="@T["The name in the default language is shown"]">@T["not translated"]</span>
+                        }
+                        <span class="text-xs whitespace-nowrap text-stone-500">@ItemCountText(entry.ItemCount)</span>
+                    </div>
+                    <div class="flex gap-1">
+                        <button type="button" class="btn-ghost btn-sm" title="@T["Edit"]" @onclick="() => StartEdit(entry)">
+                            <span class="icon-[lucide--pencil] size-4"></span><span class="sr-only">@T["Edit"]</span>
+                        </button>
+                        <button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 hover:text-red-700" title="@T["Delete"]" @onclick="() => _deletingId = entry.Id">
+                            <span class="icon-[lucide--trash-2] size-4"></span><span class="sr-only">@T["Delete"]</span>
+                        </button>
+                    </div>
+                }
+            </li>
+        }
+    </ul>
+
+    @if (_entries.Count == 0)
+    {
+        <p class="px-4 py-10 text-center text-sm text-stone-500">@T["Empty so far."]</p>
+    }
+</div>
+
+@code {
+    private const string DefaultColor = "#78716c";
+
+    [Parameter, EditorRequired]
+    public CodebookKind Kind { get; set; }
+
+    private List<CodebookEntry> _entries = [];
+    private string? _search;
+
+    private string? _newName;
+    private string _newColor = DefaultColor;
+    private string? _addError;
+
+    private int? _editingId;
+    private string? _editName;
+    private string _editColor = DefaultColor;
+    private string? _editError;
+
+    private int? _deletingId;
+    private string? _deleteError;
+
+    // Language of the names shown and edited (adding is always in the default language).
+    private string _language = "";
+
+    private bool HasColor => Kind == CodebookKind.Categories;
+
+    private string NewPlaceholder => Kind switch
+    {
+        CodebookKind.ItemTypes => T["New type, e.g. Miniature"],
+        CodebookKind.Categories => T["New category, e.g. Air Force"],
+        _ => T["New country, e.g. Yugoslavia"],
+    };
+
+    private IEnumerable<CodebookEntry> VisibleEntries
+    {
+        get
+        {
+            var search = SearchText.Normalize(_search?.Trim());
+            return search.Length == 0 ? _entries : _entries.Where(e => SearchText.Matches(search, [e.Name]));
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_language.Length == 0)
+        {
+            _language = Languages.Default.Code;
+        }
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync() =>
+        _entries = await Codebooks.GetAsync(Kind, new LanguageContext(_language, Languages.Default.Code));
+
+    private async Task LanguageChangedAsync(string language)
+    {
+        _language = language;
+        _editingId = null;
+        await ReloadAsync();
+    }
+
+    private async Task AddAsync()
+    {
+        string? error = null;
+        _addError = await SafeAction.RunAsync(Logger, "adding a codebook entry", async () => error = await Codebooks.AddAsync(Kind, _newName, HasColor ? _newColor : null))
+            ? error
+            : T[SafeAction.Message].Value;
+        if (_addError is null)
+        {
+            _newName = null;
+            _newColor = DefaultColor;
+            await ReloadAsync();
+        }
+    }
+
+    private void StartEdit(CodebookEntry entry)
+    {
+        _deletingId = null;
+        _editingId = entry.Id;
+        _editName = entry.Translation;
+        _editColor = entry.Color ?? DefaultColor;
+        _editError = null;
+    }
+
+    private void CancelEdit() => _editingId = null;
+
+    private async Task SaveEditAsync()
+    {
+        string? error = null;
+        _editError = await SafeAction.RunAsync(Logger, "editing a codebook entry", async () => error = await Codebooks.UpdateAsync(Kind, _editingId!.Value, _language, _editName, HasColor ? _editColor : null))
+            ? error
+            : T[SafeAction.Message].Value;
+        if (_editError is null)
+        {
+            _editingId = null;
+            await ReloadAsync();
+        }
+    }
+
+    private async Task DeleteAsync(CodebookEntry entry)
+    {
+        _deleteError = await SafeAction.RunAsync(Logger, "deleting a codebook entry", () => Codebooks.DeleteAsync(Kind, entry.Id))
+            ? null
+            : T[SafeAction.Message].Value;
+        _deletingId = null;
+        await ReloadAsync();
+    }
+
+    private string ItemCountText(int count) => count == 0 ? T["unused"] : T.Plural("{0} item|{0} items", count);
+
+    private string DeleteImpact(int count) => Kind switch
+    {
+        CodebookKind.ItemTypes => T.Plural("{0} item will have no type.|{0} items will have no type.", count),
+        CodebookKind.Categories => T["The category will be removed from: {0}.", ItemCountText(count)],
+        _ => T.Plural("{0} item will have no country.|{0} items will have no country.", count),
+    };
+}

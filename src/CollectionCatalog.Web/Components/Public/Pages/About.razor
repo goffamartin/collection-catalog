@@ -1,0 +1,39 @@
+@page "/o-sbirce"
+@inject SiteSettingsService SiteSettings
+
+@if (_site is null)
+{
+    return;
+}
+
+<Seo Title="@T["About the collection"]" Path="o-sbirce" Description="@(_site.About ?? _site.Intro)" />
+
+<div class="site-container max-w-3xl pt-10 sm:pt-14">
+    <p class="eyebrow">@_site.SiteName</p>
+    <h1 class="display-title mt-3 text-4xl sm:text-5xl">@T["About the collection"]</h1>
+    <div class="gold-rule mt-6"></div>
+
+    <div class="mt-8 space-y-5 text-lg leading-relaxed text-stone-700">
+        @if (_site.About is not null)
+        {
+            <TextBlock Text="@_site.About" />
+        }
+        else
+        {
+            <p>@_site.Intro</p>
+        }
+    </div>
+
+    <div class="mt-12 flex flex-wrap gap-3">
+        <a href="sbirka" class="btn rounded-full bg-stone-900 px-6 py-3 text-white shadow-sm hover:bg-stone-800">
+            @T["Browse the collection"] <span class="icon-[lucide--arrow-right] size-4"></span>
+        </a>
+        <a href="kontakt" class="btn rounded-full px-6 py-3 text-stone-700 ring-1 ring-stone-300 ring-inset hover:bg-white">@T["Contact"]</a>
+    </div>
+</div>
+
+@code {
+    private SiteInfo? _site;
+
+    protected override async Task OnInitializedAsync() => _site = await SiteSettings.GetAsync();
+}

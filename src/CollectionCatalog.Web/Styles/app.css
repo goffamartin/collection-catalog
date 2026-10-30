@@ -1,0 +1,182 @@
+/* Input for Tailwind CSS 4 – the output is generated to wwwroot/css/app.css (npm run build:css / watch:css). */
+@import "tailwindcss";
+
+/* Lucide icons as pure CSS: <span class="icon-[lucide--search]"></span> – only the used ones reach the output. */
+@plugin "@iconify/tailwind4";
+
+@source "../Components";
+
+/* Serif font of the public website's headings (Fraunces, OFL) – files are self-hosted, no third-party servers. */
+@font-face {
+    font-family: "Fraunces";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("../fonts/fraunces-latin-ext-wght-normal.woff2") format("woff2-variations");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Fraunces";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("../fonts/fraunces-latin-wght-normal.woff2") format("woff2-variations");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme {
+    /* System font (Segoe UI / SF Pro / Roboto) – modern, without loading fonts from third-party servers. */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+
+    /* Warm "paper" background of the public website. */
+    --color-paper: #f7f5f0;
+}
+
+@layer base {
+    html {
+        @apply bg-stone-50 text-stone-900 antialiased;
+    }
+
+    /* After navigation Blazor moves focus to <h1> (FocusOnNavigate) for screen readers – the outline is unnecessary. */
+    h1:focus {
+        outline: none;
+    }
+}
+
+/* Base of buttons – as @utility, so it can be used in @apply of the other variants. */
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium whitespace-nowrap transition
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500
+        disabled:pointer-events-none disabled:opacity-50;
+}
+
+/* Recurring building blocks – the markup would otherwise repeat long strings of the same utilities. */
+@layer components {
+    /* === Cards === */
+    .card {
+        @apply rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/80;
+    }
+
+    .card-header {
+        @apply flex items-center justify-between gap-3 border-b border-stone-100 px-5 py-4;
+    }
+
+    .card-title {
+        @apply flex items-center gap-2 text-sm font-semibold text-stone-900;
+    }
+
+    .card-body {
+        @apply p-5;
+    }
+
+    /* === Forms === */
+    .form-label {
+        @apply mb-1.5 block text-sm font-medium text-stone-700;
+    }
+
+    .form-hint {
+        @apply mt-1.5 text-xs text-stone-500;
+    }
+
+    .form-input {
+        @apply block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-stone-900 shadow-xs ring-1 ring-stone-300 transition
+            ring-inset placeholder:text-stone-500 focus:ring-2 focus:ring-amber-500 focus:outline-none
+            disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-stone-500;
+    }
+
+    select.form-input {
+        @apply appearance-none bg-[length:1rem] bg-[right_0.6rem_center] bg-no-repeat pr-9;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    }
+
+    .form-checkbox {
+        @apply size-4 shrink-0 rounded border-stone-300 accent-amber-600;
+    }
+
+    /* Validation of Blazor forms */
+    .validation-message {
+        @apply mt-1.5 text-xs font-medium text-red-600;
+    }
+
+    .form-input.invalid {
+        @apply ring-red-400 focus:ring-red-500;
+    }
+
+    /* === Buttons (the base is @utility btn above) === */
+    .btn-primary {
+        @apply btn bg-stone-900 text-white shadow-sm hover:bg-stone-800;
+    }
+
+    .btn-accent {
+        @apply btn bg-amber-500 text-stone-950 shadow-sm hover:bg-amber-400;
+    }
+
+    .btn-secondary {
+        @apply btn bg-white text-stone-700 shadow-xs ring-1 ring-stone-300 ring-inset hover:bg-stone-50;
+    }
+
+    .btn-ghost {
+        @apply btn text-stone-600 hover:bg-stone-100 hover:text-stone-900;
+    }
+
+    .btn-danger {
+        @apply btn bg-white text-red-600 shadow-xs ring-1 ring-red-200 ring-inset hover:bg-red-50;
+    }
+
+    /* Confirming an irreversible action ("Really delete?" → Delete). */
+    .btn-danger-solid {
+        @apply btn bg-red-600 text-white hover:bg-red-500;
+    }
+
+    .btn-sm {
+        @apply gap-1.5 rounded-md px-2.5 py-1.5 text-xs;
+    }
+
+    /* === Public website === */
+    .site-container {
+        @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+    }
+
+    /* Small heading above the main heading of a section. */
+    .eyebrow {
+        @apply text-xs font-semibold tracking-[0.18em] text-amber-700 uppercase;
+    }
+
+    .display-title {
+        @apply font-display font-medium tracking-tight text-balance text-stone-900;
+    }
+
+    /* Golden line below a heading. */
+    .gold-rule {
+        @apply h-px w-12 bg-gradient-to-r from-amber-600 to-amber-300;
+    }
+
+    /* Area for a photo (background before it loads, and margins for photos of another aspect ratio). */
+    .photo-well {
+        @apply relative overflow-hidden rounded-xl bg-stone-100;
+    }
+
+    .text-link {
+        @apply font-medium text-amber-800 underline decoration-amber-300 underline-offset-4 transition hover:decoration-amber-600;
+    }
+
+    /* === Badges === */
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+    }
+}
+
+/* Error bar of Blazor (shown by the framework on an unhandled error in an interactive component) */
+#blazor-error-ui {
+    @apply fixed inset-x-0 bottom-0 z-50 hidden bg-amber-100 px-4 py-3 text-sm text-stone-900 shadow-lg;
+}
+
+#blazor-error-ui .reload {
+    @apply ml-2 font-medium underline;
+}
+
+#blazor-error-ui .dismiss {
+    @apply absolute top-2.5 right-4 cursor-pointer;
+}

@@ -1,0 +1,100 @@
+@using System.Globalization
+@using CollectionCatalog.Web.Services.Languages
+@inject SiteSettingsService SiteSettings
+@inject SiteOptions Site
+@inject LanguageService Languages
+
+@* Title, description, canonical URL, the page in other languages (hreflang) and the social preview (OpenGraph). *@
+<PageTitle>@_fullTitle</PageTitle>
+<HeadContent>
+    @if (_description is not null)
+    {
+        <meta name="description" content="@_description" />
+        <meta property="og:description" content="@_description" />
+    }
+    <link rel="canonical" href="@_canonical" />
+    @if (!NoIndex && Languages.All.Count > 1)
+    {
+        @foreach (var (languageCode, url) in _alternates)
+        {
+            <link rel="alternate" hreflang="@languageCode" href="@url" />
+        }
+        <link rel="alternate" hreflang="x-default" href="@_alternates[Languages.Default.Code]" />
+    }
+    <meta property="og:site_name" content="@_siteName" />
+    <meta property="og:title" content="@(Title ?? _siteName)" />
+    <meta property="og:type" content="@(ImageKey is not null && Title is not null ? "article" : "website")" />
+    <meta property="og:url" content="@_canonical" />
+    <meta property="og:locale" content="@OpenGraphLocale(Languages.Current.Code)" />
+    @if (ImageKey is not null)
+    {
+        <meta property="og:image" content="@Site.Absolute(HttpContext, PublicUrls.ImageJpeg(ImageKey))" />
+        <meta name="twitter:card" content="summary_large_image" />
+    }
+    @if (NoIndex)
+    {
+        <meta name="robots" content="noindex" />
+    }
+</HeadContent>
+
+@code {
+    private const int MaxDescriptionLength = 160;
+
+    private string? _fullTitle;
+    private string? _description;
+    private string? _canonical;
+    private string? _siteName;
+    private Dictionary<string, string> _alternates = [];
+
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    /// <summary>Title of the page; <c>null</c> = home page (just the name of the website).</summary>
+    [Parameter] public string? Title { get; set; }
+
+    [Parameter] public string? Description { get; set; }
+
+    /// <summary>Relative path of the canonical URL (without query string), e.g. „sbirka“.</summary>
+    [Parameter] public string Path { get; set; } = "";
+
+    /// <summary>
+    /// Path of the page in another language, when it differs (item detail – the slug comes from the translated name).
+    /// By default the same <see cref="Path"/> in every language.
+    /// </summary>
+    [Parameter] public Func<LanguageContext, string>? PathIn { get; set; }
+
+    /// <summary>Photo for the social preview.</summary>
+    [Parameter] public string? ImageKey { get; set; }
+
+    [Parameter] public bool NoIndex { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var site = await SiteSettings.GetAsync();
+        _siteName = site.SiteName;
+        _fullTitle = Title is null ? $"{site.SiteName} – {site.Headline}" : $"{Title} · {site.SiteName}";
+        _description = Shorten(Description ?? site.Intro);
+        _canonical = Site.Page(HttpContext, Path);
+        _alternates = Languages.All.ToDictionary(
+            language => language.Code,
+            language => Site.PageIn(HttpContext, Languages.PathPrefix(language.Code),
+                PathIn?.Invoke(new LanguageContext(language.Code, Languages.Default.Code)) ?? Path));
+    }
+
+    /// <summary>OpenGraph wants a region too: cs → cs_CZ, en → en_US.</summary>
+    private static string OpenGraphLocale(string code) => CultureInfo.CreateSpecificCulture(code).Name.Replace('-', '_');
+
+    private static string? Shorten(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+        var flat = string.Join(' ', text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        if (flat.Length <= MaxDescriptionLength)
+        {
+            return flat;
+        }
+        var cut = flat.LastIndexOf(' ', MaxDescriptionLength - 1);
+        return string.Concat(flat.AsSpan(0, cut > 0 ? cut : MaxDescriptionLength - 1), "…");
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "name": "collection-catalog",
+  "scripts": {
+    "build:css": "tailwindcss -i src/CollectionCatalog.Web/Styles/app.css -o src/CollectionCatalog.Web/wwwroot/css/app.css --minify",
+    "watch:css": "tailwindcss -i src/CollectionCatalog.Web/Styles/app.css -o src/CollectionCatalog.Web/wwwroot/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "1.2.147",
+    "@iconify/tailwind4": "1.2.3",
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}

@@ -1,0 +1,17 @@
+@* Paging button; without Href it renders as disabled. *@
+@if (Href is null)
+{
+    <span class="flex size-10 items-center justify-center rounded-full text-stone-300" aria-hidden="true">@ChildContent</span>
+}
+else
+{
+    <a href="@Href" aria-label="@Label" aria-current="@(Current ? "page" : null)"
+       class="@($"flex size-10 items-center justify-center rounded-full text-sm font-medium transition {(Current ? "bg-stone-900 text-white" : "text-stone-600 hover:bg-white hover:ring-1 hover:ring-stone-200")}")">@ChildContent</a>
+}
+
+@code {
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool Current { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

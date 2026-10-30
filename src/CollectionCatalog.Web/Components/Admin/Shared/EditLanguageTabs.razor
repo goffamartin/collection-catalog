@@ -1,0 +1,32 @@
+@inject LanguageService Languages
+
+@* Language of the translatable fields in a form. Hidden when the website has a single language. *@
+@if (Languages.All.Count > 1)
+{
+    <div class="@($"flex flex-wrap items-center gap-3 {CssClass}")">
+        <FilterTabs TValue="string" Options="_options" Selected="Value" OnSelect="SelectAsync" Label="@T["Language of the texts"]" />
+        <p class="text-xs text-stone-500">
+            @if (Value == Languages.Default.Code)
+            {
+                @T["Fields marked with a language are translatable. Other data is shared by all languages."]
+            }
+            else
+            {
+                @T["Translation: an empty field shows the text in {0}.", Languages.Default.Name]
+            }
+        </p>
+    </div>
+}
+
+@code {
+    private (string, string)[] _options = [];
+
+    [Parameter, EditorRequired] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    protected override void OnParametersSet() =>
+        _options = Languages.All.Select(l => (l.Code, l.Name)).ToArray();
+
+    private Task SelectAsync(string code) => ValueChanged.InvokeAsync(code);
+}

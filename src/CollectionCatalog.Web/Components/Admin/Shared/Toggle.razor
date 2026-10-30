@@ -1,0 +1,30 @@
+@* Switch with a label – accessible as role="switch". *@
+<div class="flex items-start justify-between gap-4">
+    <div>
+        <p class="text-sm font-medium text-stone-900">@Label</p>
+        @if (Description is not null)
+        {
+            <p class="mt-0.5 text-sm text-stone-500">@Description</p>
+        }
+    </div>
+    <button type="button" role="switch" aria-checked="@(Value ? "true" : "false")" aria-label="@Label" @onclick="ToggleAsync"
+            class="relative mt-0.5 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 @(Value ? "bg-amber-500" : "bg-stone-200")">
+        <span class="pointer-events-none absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow ring-0 transition-transform @(Value ? "translate-x-5" : "translate-x-0")"></span>
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = default!;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    private Task ToggleAsync() => ValueChanged.InvokeAsync(!Value);
+}

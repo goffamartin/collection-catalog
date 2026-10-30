@@ -1,0 +1,101 @@
+@page "/prihlaseni"
+
+@using System.ComponentModel.DataAnnotations
+@using CollectionCatalog.Web.Data
+@using Microsoft.AspNetCore.Identity
+@using CollectionCatalog.Web.Services.Users
+
+@inject SignInManager<AppUser> SignInManager
+@inject LoginAttemptLimiter AttemptLimiter
+@inject IdentityRedirectManager RedirectManager
+@inject ILogger<Login> Logger
+
+<PageTitle>@T["Sign in"]</PageTitle>
+
+<h1 class="mb-4 text-lg font-semibold">@T["Sign in to the administration"]</h1>
+
+<StatusMessage Message="@_errorMessage" />
+
+<EditForm Model="Input" method="post" OnValidSubmit="LoginAsync" FormName="login" class="space-y-4">
+    <LocalizedValidator />
+    <div>
+        <label for="username" class="form-label">@T["User name"]</label>
+        <InputText @bind-Value="Input.UserName" id="username" class="form-input" autocomplete="username" autocapitalize="none" />
+        <ValidationMessage For="() => Input.UserName" />
+    </div>
+    <div>
+        <label for="password" class="form-label">@T["Password"]</label>
+        <InputText @bind-Value="Input.Password" id="password" type="password" class="form-input" autocomplete="current-password" />
+        <ValidationMessage For="() => Input.Password" />
+    </div>
+    <label class="flex items-center gap-2 text-sm text-stone-700">
+        <InputCheckbox @bind-Value="Input.RememberMe" class="size-4 rounded border-stone-300 accent-stone-900" />
+        @T["Stay signed in"]
+    </label>
+    <button type="submit" class="btn-primary w-full">@AppText.In("button", "Sign in")</button>
+</EditForm>
+
+<p class="mt-4 text-xs text-stone-500">@T["A forgotten password is reset by the administrator."]</p>
+
+@code {
+    private string? _errorMessage;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "login")]
+    private LoginInputModel Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Input ??= new();
+    }
+
+    private async Task LoginAsync()
+    {
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        if (AttemptLimiter.IsBlocked(clientIp))
+        {
+            Logger.LogWarning("Sign-in from {ClientIp} blocked after repeated failed attempts.", clientIp);
+            _errorMessage = Error(T["Too many failed sign-in attempts. Try again in {0} minutes.", LoginAttemptLimiter.Window.TotalMinutes.ToString("0")]);
+            return;
+        }
+
+        var result = await SignInManager.PasswordSignInAsync(Input.UserName.Trim(), Input.Password, Input.RememberMe, lockoutOnFailure: true);
+
+        if (result.Succeeded)
+        {
+            AttemptLimiter.Reset(clientIp);
+            RedirectManager.RedirectTo(string.IsNullOrEmpty(ReturnUrl) ? "admin" : ReturnUrl, fallback: "admin");
+            return;
+        }
+
+        AttemptLimiter.RegisterFailure(clientIp);
+
+        if (result.IsLockedOut)
+        {
+            Logger.LogWarning("Account {UserName} is temporarily locked out after repeated failed attempts.", Input.UserName);
+            _errorMessage = Error(T["Too many failed attempts. Try again in 15 minutes."]);
+            return;
+        }
+
+        _errorMessage = Error(T["Incorrect user name or password."]);
+    }
+
+    /// <summary>"Error: …" – StatusMessage shows texts starting with the word Error as an error.</summary>
+    private string Error(string message) => $"{T["Error"]}: {message}";
+
+    private sealed class LoginInputModel
+    {
+        [Required(ErrorMessage = "Enter the user name.")]
+        public string UserName { get; set; } = "";
+
+        [Required(ErrorMessage = "Enter the password.")]
+        public string Password { get; set; } = "";
+
+        public bool RememberMe { get; set; } = true;
+    }
+}

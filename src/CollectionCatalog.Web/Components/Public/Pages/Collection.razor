@@ -1,0 +1,248 @@
+@page "/sbirka"
+@using System.Globalization
+@inject PublicItemQuery Query
+
+@if (_page is null)
+{
+    return;
+}
+
+@* Filters are a plain GET form – the URL can be shared and everything works without JavaScript
+   (site.js only submits the form after a select changes and leaves out empty fields). *@
+<Seo Title="@T["Collection"]" Path="sbirka" Description="@_description" NoIndex="_filter != new PublicItemFilter()" />
+
+<div class="site-container pt-10 sm:pt-14">
+    <p class="eyebrow">@T["Catalogue"]</p>
+    <div class="mt-3 flex flex-wrap items-end justify-between gap-4">
+        <h1 class="display-title text-4xl sm:text-5xl">@T["Collection"]</h1>
+        <p class="text-sm text-stone-500">@T.Plural("{0} item|{0} items", _page.TotalCount)</p>
+    </div>
+    <div class="gold-rule mt-6"></div>
+
+    <form method="get" action="sbirka" data-autosubmit class="mt-8 rounded-2xl bg-white/70 p-4 shadow-xs ring-1 ring-stone-200/80 sm:p-5">
+        <div class="flex flex-col gap-3 sm:flex-row">
+            <label class="relative flex-1">
+                <span class="sr-only">@T["Search"]</span>
+                <span class="icon-[lucide--search] pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-stone-400"></span>
+                <input type="search" name="hledat" value="@Hledat" aria-label="@T["Search the collection"]" placeholder="@T["Search name, country, description…"]" class="form-input rounded-full py-2.5 pl-10" />
+            </label>
+            <label class="sm:w-52">
+                <span class="sr-only">@T["Sorting"]</span>
+                <select name="razeni" class="form-input rounded-full py-2.5">
+                    <option value="" selected="@(_filter.Sort == PublicSort.Newest)">@T["Recently added"]</option>
+                    <option value="nazev" selected="@(_filter.Sort == PublicSort.Name)">@T["Name A–Z"]</option>
+                    <option value="nejstarsi" selected="@(_filter.Sort == PublicSort.Oldest)">@T["Oldest first"]</option>
+                    <option value="nejmladsi" selected="@(_filter.Sort == PublicSort.Youngest)">@T["Newest first"]</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-[1fr_1fr_1fr_auto_auto]">
+            <FacetSelect Name="typ" Label="@T["All types"]" Options="_page.Types" Selected="_filter.TypeId" />
+            <FacetSelect Name="zeme" Label="@T["All countries"]" Options="_page.Countries" Selected="_filter.CountryId" />
+            <FacetSelect Name="kategorie" Label="@T["All categories"]" Options="_page.Categories" Selected="_filter.CategoryId" />
+            <div class="flex items-center gap-2">
+                <label class="flex-1 lg:w-24">
+                    <span class="sr-only">@T["Year from"]</span>
+                    <input type="number" name="od" value="@_filter.YearFrom" placeholder="@T["Year from"]" min="1000" max="2100" inputmode="numeric" class="form-input rounded-full" />
+                </label>
+                <span class="text-stone-400">–</span>
+                <label class="flex-1 lg:w-24">
+                    <span class="sr-only">@T["Year to"]</span>
+                    <input type="number" name="do" value="@_filter.YearTo" placeholder="@T["to"]" min="1000" max="2100" inputmode="numeric" class="form-input rounded-full" />
+                </label>
+            </div>
+            <button type="submit" class="btn col-span-2 rounded-full bg-stone-900 px-5 text-white hover:bg-stone-800 lg:col-span-1">
+                <span class="icon-[lucide--sliders-horizontal] size-4"></span> @T["Filter"]
+            </button>
+        </div>
+    </form>
+
+    @if (_activeFilters.Count > 0)
+    {
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+            @foreach (var (label, removeUrl) in _activeFilters)
+            {
+                <a href="@removeUrl" class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 py-1 pr-2 pl-3 text-amber-900 ring-1 ring-amber-200 hover:bg-amber-100" title="@T["Remove filter"]">
+                    @label <span class="icon-[lucide--x] size-3.5"></span>
+                </a>
+            }
+            <a href="sbirka" class="ml-1 text-stone-500 underline-offset-4 hover:text-stone-800 hover:underline">@T["Clear all"]</a>
+        </div>
+    }
+
+    @if (_page.Items.Count == 0)
+    {
+        <div class="mt-16 flex flex-col items-center text-center">
+            <span class="flex size-14 items-center justify-center rounded-full bg-white text-stone-400 ring-1 ring-stone-200">
+                <span class="icon-[lucide--search-x] size-6"></span>
+            </span>
+            <p class="mt-4 font-display text-xl">@T["We found nothing"]</p>
+            <p class="mt-1 text-sm text-stone-500">
+                @if (_activeFilters.Count > 0)
+                {
+                    <span>@T["Try changing or"] <a href="sbirka" class="text-link">@T["clearing the filters"]</a>.</span>
+                }
+                else
+                {
+                    <span>@T["The collection is being prepared."]</span>
+                }
+            </p>
+        </div>
+    }
+    else
+    {
+        <h2 class="sr-only">@T["Results"]</h2>
+        <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
+            @foreach (var item in _page.Items)
+            {
+                <ItemCard Item="item" />
+            }
+        </div>
+
+        @if (_page.PageCount > 1)
+        {
+            <nav class="mt-14 flex items-center justify-center gap-1" aria-label="@T["Pagination"]">
+                <PageLink Href="@(_page.Page > 1 ? PageUrl(_page.Page - 1) : null)" Label="@T["Previous page"]">
+                    <span class="icon-[lucide--chevron-left] size-4"></span>
+                </PageLink>
+                @foreach (var number in PageNumbers())
+                {
+                    if (number is null)
+                    {
+                        <span class="px-2 text-stone-500">…</span>
+                    }
+                    else
+                    {
+                        <PageLink Href="@PageUrl(number.Value)" Label="@T["Page {0}", number]" Current="number == _page.Page">@number</PageLink>
+                    }
+                }
+                <PageLink Href="@(_page.Page < _page.PageCount ? PageUrl(_page.Page + 1) : null)" Label="@T["Next page"]">
+                    <span class="icon-[lucide--chevron-right] size-4"></span>
+                </PageLink>
+            </nav>
+        }
+    }
+</div>
+
+@code {
+    private static readonly CultureInfo _invariant = CultureInfo.InvariantCulture;
+
+    private PublicItemFilter _filter = new();
+    private PublicItemPage _page = null!;
+    private List<(string Label, string RemoveUrl)> _activeFilters = [];
+    private string? _description;
+
+    // Query parameters as text – an invalid value (hand-edited URL) is just ignored.
+    [SupplyParameterFromQuery] public string? Hledat { get; set; }
+    [SupplyParameterFromQuery] public string? Typ { get; set; }
+    [SupplyParameterFromQuery] public string? Zeme { get; set; }
+    [SupplyParameterFromQuery] public string? Kategorie { get; set; }
+    [SupplyParameterFromQuery] public string? Od { get; set; }
+    [SupplyParameterFromQuery] public string? Do { get; set; }
+    [SupplyParameterFromQuery] public string? Razeni { get; set; }
+    [SupplyParameterFromQuery] public string? Strana { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _filter = new PublicItemFilter
+        {
+            Search = string.IsNullOrWhiteSpace(Hledat) ? null : Hledat.Trim(),
+            TypeId = QueryValue.Int(Typ),
+            CountryId = QueryValue.Int(Zeme),
+            CategoryId = QueryValue.Int(Kategorie),
+            YearFrom = QueryValue.Int(Od),
+            YearTo = QueryValue.Int(Do),
+            Sort = Razeni switch
+            {
+                "nazev" => PublicSort.Name,
+                "nejstarsi" => PublicSort.Oldest,
+                "nejmladsi" => PublicSort.Youngest,
+                _ => PublicSort.Newest,
+            },
+        };
+        _page = await Query.SearchAsync(_filter with { Page = QueryValue.Int(Strana) ?? 1 });
+        // Paging is not "another filter" – NoIndex and the filter chips compare without it.
+
+        _activeFilters = [];
+        if (_filter.Search is { } search)
+        {
+            _activeFilters.Add(($"„{search}“", Url(_filter with { Search = null })));
+        }
+        AddFacet(_page.Types, _filter.TypeId, f => f with { TypeId = null });
+        AddFacet(_page.Countries, _filter.CountryId, f => f with { CountryId = null });
+        AddFacet(_page.Categories, _filter.CategoryId, f => f with { CategoryId = null });
+        if (_filter.YearFrom is not null || _filter.YearTo is not null)
+        {
+            var label = (_filter.YearFrom, _filter.YearTo) switch
+            {
+                ({ } from, { } to) => $"{from}–{to}",
+                ({ } from, null) => T["from {0}", from],
+                (null, { } to) => T["to {0}", to],
+                _ => "",
+            };
+            _activeFilters.Add((label, Url(_filter with { YearFrom = null, YearTo = null })));
+        }
+
+        _description = T["Catalogue of the collection – {0}.", T.Plural("{0} item|{0} items", _page.TotalCount)];
+    }
+
+    private void AddFacet(List<FacetOption> options, int? selected, Func<PublicItemFilter, PublicItemFilter> remove)
+    {
+        if (selected is { } id && options.FirstOrDefault(o => o.Id == id) is { } option)
+        {
+            _activeFilters.Add((option.Name, Url(remove(_filter))));
+        }
+    }
+
+    private string PageUrl(int page) => Url(_filter with { Page = page });
+
+    /// <summary>URL of the collection for a filter – empty values are left out.</summary>
+    private static string Url(PublicItemFilter filter)
+    {
+        var query = new List<string>();
+        void Add(string name, string? value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                query.Add($"{name}={Uri.EscapeDataString(value)}");
+            }
+        }
+
+        Add("hledat", filter.Search);
+        Add("typ", filter.TypeId?.ToString(_invariant));
+        Add("zeme", filter.CountryId?.ToString(_invariant));
+        Add("kategorie", filter.CategoryId?.ToString(_invariant));
+        Add("od", filter.YearFrom?.ToString(_invariant));
+        Add("do", filter.YearTo?.ToString(_invariant));
+        Add("razeni", filter.Sort switch
+        {
+            PublicSort.Name => "nazev",
+            PublicSort.Oldest => "nejstarsi",
+            PublicSort.Youngest => "nejmladsi",
+            _ => null,
+        });
+        Add("strana", filter.Page > 1 ? filter.Page.ToString(_invariant) : null);
+
+        return query.Count == 0 ? "sbirka" : $"sbirka?{string.Join('&', query)}";
+    }
+
+    /// <summary>Page numbers with ellipses: 1 … 4 5 6 … 12.</summary>
+    private IEnumerable<int?> PageNumbers()
+    {
+        int? previous = null;
+        for (var number = 1; number <= _page.PageCount; number++)
+        {
+            if (number == 1 || number == _page.PageCount || Math.Abs(number - _page.Page) <= 1)
+            {
+                if (previous is { } p && number - p > 1)
+                {
+                    yield return null;
+                }
+                yield return number;
+                previous = number;
+            }
+        }
+    }
+
+}

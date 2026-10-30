@@ -1,0 +1,24 @@
+@* Paging below a table: „51–100 of 230“ and Previous / Next buttons. Pages are zero-based. *@
+@if (PageCount > 1)
+{
+    <nav class="flex items-center justify-between border-t border-stone-100 px-4 py-3 text-sm text-stone-500" aria-label="@T["Paging"]">
+        <span><span class="font-medium text-stone-900">@(Page * PageSize + 1)–@Math.Min((Page + 1) * PageSize, Total)</span> @T["of"] @Total</span>
+        <div class="flex gap-2">
+            <button type="button" class="btn-secondary btn-sm" disabled="@(Page == 0)" @onclick="() => OnPage.InvokeAsync(Page - 1)">
+                <span class="icon-[lucide--chevron-left] size-3.5"></span> @T["Previous"]
+            </button>
+            <button type="button" class="btn-secondary btn-sm" disabled="@(Page >= PageCount - 1)" @onclick="() => OnPage.InvokeAsync(Page + 1)">
+                @T["Next"] <span class="icon-[lucide--chevron-right] size-3.5"></span>
+            </button>
+        </div>
+    </nav>
+}
+
+@code {
+    [Parameter] public int Page { get; set; }
+    [Parameter] public int PageSize { get; set; }
+    [Parameter] public int Total { get; set; }
+    [Parameter] public EventCallback<int> OnPage { get; set; }
+
+    private int PageCount => (Total + PageSize - 1) / PageSize;
+}

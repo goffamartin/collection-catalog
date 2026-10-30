@@ -1,0 +1,91 @@
+@page "/admin/ucet"
+
+@using System.ComponentModel.DataAnnotations
+@using CollectionCatalog.Web.Components.Account
+@using CollectionCatalog.Web.Data
+@using CollectionCatalog.Web.Infrastructure
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<AppUser> UserManager
+@inject SignInManager<AppUser> SignInManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>@T["My account – administration"]</PageTitle>
+
+<h1 class="text-2xl font-semibold tracking-tight">@T["My account"]</h1>
+<p class="mt-1 mb-6 text-sm text-stone-500">@(_user?.DisplayName ?? _user?.UserName)</p>
+
+<StatusMessage Message="@_errorMessage" />
+
+<section class="max-w-md rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 font-semibold">@T["Change password"]</h2>
+    <EditForm Model="Input" method="post" OnValidSubmit="ChangePasswordAsync" FormName="change-password" class="space-y-4">
+        <LocalizedValidator />
+        <input type="text" name="username" value="@_user?.UserName" autocomplete="username" hidden />
+        <div>
+            <label for="current" class="form-label">@T["Current password"]</label>
+            <InputText @bind-Value="Input.CurrentPassword" id="current" type="password" class="form-input" autocomplete="current-password" />
+            <ValidationMessage For="() => Input.CurrentPassword" />
+        </div>
+        <div>
+            <label for="new" class="form-label">@T["New password"]</label>
+            <InputText @bind-Value="Input.NewPassword" id="new" type="password" class="form-input" autocomplete="new-password" />
+            <p class="mt-1 text-xs text-stone-500">@T["At least {0} characters.", AuthenticationSetup.MinPasswordLength]</p>
+            <ValidationMessage For="() => Input.NewPassword" />
+        </div>
+        <div>
+            <label for="confirm" class="form-label">@T["New password again"]</label>
+            <InputText @bind-Value="Input.ConfirmPassword" id="confirm" type="password" class="form-input" autocomplete="new-password" />
+            <ValidationMessage For="() => Input.ConfirmPassword" />
+        </div>
+        <button type="submit" class="btn-primary">@AppText.In("action", "Change password")</button>
+    </EditForm>
+</section>
+
+@code {
+    private AppUser? _user;
+    private string? _errorMessage;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "change-password")]
+    private ChangePasswordInputModel Input { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input ??= new();
+        _user = await UserManager.GetUserAsync(HttpContext.User);
+    }
+
+    private async Task ChangePasswordAsync()
+    {
+        if (_user is null)
+        {
+            return;
+        }
+
+        var result = await UserManager.ChangePasswordAsync(_user, Input.CurrentPassword, Input.NewPassword);
+        if (!result.Succeeded)
+        {
+            _errorMessage = $"{T["Error"]}: {string.Join(" ", result.Errors.Select(e => e.Description))}";
+            return;
+        }
+
+        // Changing the password changes the security stamp – refresh the sign-in so it stays valid on this device.
+        await SignInManager.RefreshSignInAsync(_user);
+        RedirectManager.RedirectToCurrentPageWithStatus(T["The password was changed."], HttpContext);
+    }
+
+    private sealed class ChangePasswordInputModel
+    {
+        [Required(ErrorMessage = "Enter the current password.")]
+        public string CurrentPassword { get; set; } = "";
+
+        [Required(ErrorMessage = "Enter the new password.")]
+        public string NewPassword { get; set; } = "";
+
+        [Compare(nameof(NewPassword), ErrorMessage = "The passwords do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

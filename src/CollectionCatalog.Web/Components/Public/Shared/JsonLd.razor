@@ -1,0 +1,24 @@
+@using System.Text.Json
+@inject SiteOptions Site
+
+@* Structured data for search engines (schema.org, JSON-LD). Google reads it from the page body too,
+   so it does not clash with the <HeadContent> of the Seo component. The default JsonSerializer escapes < and >,
+   so text from the database cannot end the <script>. *@
+@((MarkupString)_script)
+
+@code {
+    private static readonly JsonSerializerOptions _options = new() { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
+
+    private string _script = "";
+
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    /// <summary>Builds the data; gets a function turning a relative path into an absolute URL of the website.</summary>
+    [Parameter, EditorRequired] public Func<Func<string, string>, object?> Data { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        var data = Data(path => Site.Page(HttpContext, path));
+        _script = data is null ? "" : $"<script type=\"application/ld+json\">{JsonSerializer.Serialize(data, _options)}</script>";
+    }
+}

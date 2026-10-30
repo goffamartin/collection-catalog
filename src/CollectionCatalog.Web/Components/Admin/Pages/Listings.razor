@@ -1,0 +1,95 @@
+@page "/admin/nabidky"
+@rendermode InteractiveServer
+@inject ListingService ListingService
+@inject NavigationManager Navigation
+@using System.Globalization
+
+<PageTitle>@T["Offers – administration"]</PageTitle>
+
+<PageHeader Title="@T["Offers"]">
+    <Description>@T["Pieces for sale and trade. A new offer is created in the item detail (section „Offer for sale“)."]</Description>
+    <Actions>
+        <a href="nabidka" target="_blank" class="btn-secondary"><span class="icon-[lucide--external-link] size-4"></span> @T["Offers on the website"]</a>
+    </Actions>
+</PageHeader>
+
+<FilterTabs TValue="ListingBox" Options="BoxOptions" Selected="_box" OnSelect="SetBox" Label="@T["Show offers"]" CssClass="mb-4" />
+
+<div class="card overflow-hidden">
+    @if (_rows is null)
+    {
+        <div class="card-body text-sm text-stone-500"><span class="icon-[lucide--loader-circle] size-4 animate-spin align-[-3px]"></span> @T["Loading…"]</div>
+    }
+    else if (_rows.Count == 0)
+    {
+        <div class="flex flex-col items-center px-4 py-16 text-center">
+            <span class="icon-[lucide--tag] size-10 text-stone-300"></span>
+            <p class="mt-3 font-medium text-stone-900">@(_box == ListingBox.Closed ? T["No closed offers"] : T["Nothing on offer yet"])</p>
+            <p class="mt-1 text-sm text-stone-500">@T["Open an item and in the section „Offer for sale“ click „Offer for sale“."]</p>
+            <a href="@AdminUrls.Items" class="btn-secondary btn-sm mt-4">@T["Go to items"]</a>
+        </div>
+    }
+    else
+    {
+        <ul class="divide-y divide-stone-100">
+            @foreach (var row in _rows)
+            {
+                <li class="flex items-center gap-4 px-4 py-3 transition hover:bg-amber-50/40">
+                    <AdminThumbnail FileKey="@row.ThumbnailKey" />
+                    <div class="min-w-0 flex-1">
+                        <a href="@AdminUrls.Item(row.ItemId)" class="font-medium text-stone-900 hover:text-amber-700">@row.ItemName</a>
+                        <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-stone-500">
+                            <span class="@($"badge {ItemListingPanel.StatusClass(row.Status)}")">@row.Status.Label()</span>
+                            @if (!row.ItemIsPublic)
+                            {
+                                <ItemBadge Kind="ItemBadgeKind.NotInCollection" />
+                            }
+                            <span>@DateLabel(row)</span>
+                        </div>
+                    </div>
+                    <div class="hidden text-right sm:block">
+                        <p class="text-sm font-semibold text-stone-900 tabular-nums">@(row.AskingPrice is null ? T["on request"] : Format.Money(row.AskingPrice))</p>
+                        @if (row.Status == ListingStatus.Sold && row.SalePrice is not null)
+                        {
+                            <p class="text-xs text-stone-500">@T["sold for {0}", Format.Money(row.SalePrice)]</p>
+                        }
+                    </div>
+                    <a href="@AdminUrls.InquiriesForListing(row.Id)" class="flex w-24 shrink-0 items-center justify-end gap-1.5 text-sm text-stone-500 hover:text-amber-700" title="@T["Inquiries"]">
+                        <span class="icon-[lucide--inbox] size-4"></span> @row.InquiryCount
+                        @if (row.NewInquiryCount > 0)
+                        {
+                            <span class="badge bg-amber-500 text-white">+@row.NewInquiryCount</span>
+                        }
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private (ListingBox, string)[] BoxOptions => [(ListingBox.Open, T["Open"]), (ListingBox.Closed, T["Closed"]), (ListingBox.All, T["All"])];
+
+    private List<ListingRow>? _rows;
+    private ListingBox _box;
+
+    [SupplyParameterFromQuery(Name = "stav")] public string? QueryBox { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _box = QueryBox switch { "uzavrene" => ListingBox.Closed, "vse" => ListingBox.All, _ => ListingBox.Open };
+        _rows = await ListingService.GetListingsAsync(_box);
+    }
+
+    private void SetBox(ListingBox box) =>
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameter("stav", box switch { ListingBox.Closed => "uzavrene", ListingBox.All => "vse", _ => null }), replace: true);
+
+    private string DateLabel(ListingRow row) => row switch
+    {
+        { ClosedAt: { } closed } => T["closed {0}", Date(closed)],
+        { PublishedAt: { } published } => T["published {0}", Date(published)],
+        _ => T["created {0}", Date(row.CreatedAt)],
+    };
+
+    private string Date(DateTime utc) => AppTime.ToLocal(utc).ToString(T["M/d/yyyy"], CultureInfo.CurrentCulture);
+}

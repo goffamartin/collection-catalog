@@ -1,0 +1,38 @@
+@* Bar at the bottom edge of a form: "Unsaved changes" with save and discard, briefly "Saved" after saving.
+   Must be inside the form – the Save button submits it. *@
+@if (Dirty || SavedRecently)
+{
+    <div class="fixed inset-x-0 bottom-0 z-20 border-t border-stone-200 bg-white/90 backdrop-blur lg:left-64">
+        @* Shorter texts on phones – the full ones would not fit. *@
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            @if (Dirty)
+            {
+                <span class="flex items-center gap-2 text-sm text-stone-600">
+                    <span class="size-2 shrink-0 rounded-full bg-amber-500"></span>
+                    <span class="sm:hidden">@T["Unsaved"]</span><span class="hidden sm:inline">@T["Unsaved changes"]</span>
+                </span>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-ghost" disabled="@Saving" @onclick="OnDiscard">
+                        <span class="icon-[lucide--undo-2] size-4"></span>
+                        <span class="sm:hidden">@T["Discard"]</span><span class="hidden sm:inline">@T["Discard changes"]</span>
+                    </button>
+                    <button type="submit" class="btn-primary" disabled="@Saving">
+                        <span class="icon-[lucide--save] size-4"></span>
+                        <span class="sm:hidden">@T["Save"]</span><span class="hidden sm:inline">@T["Save changes"]</span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <span class="flex items-center gap-2 text-sm font-medium text-emerald-700"><span class="icon-[lucide--circle-check] size-4"></span> @T["Saved"]</span>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Dirty { get; set; }
+    [Parameter] public bool SavedRecently { get; set; }
+    [Parameter] public bool Saving { get; set; }
+    [Parameter] public EventCallback OnDiscard { get; set; }
+}

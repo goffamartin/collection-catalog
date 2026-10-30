@@ -1,0 +1,18 @@
+@inherits InputNumber<decimal?>
+
+@* Amount: number field with the currency symbol as suffix. Inherits InputNumber, so validation and EditContext work. *@
+<div class="relative">
+    <input id="@Id" type="number" min="0" step="1" inputmode="numeric" placeholder="0"
+           class="form-input pr-10 tabular-nums @CssClass" value="@CurrentValueAsString"
+           @onchange="e => CurrentValueAsString = e.Value?.ToString()" />
+    <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-stone-500">@Money.Symbol</span>
+</div>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    // No needless decimals („350“, not „350.0“).
+    protected override string? FormatValueAsString(decimal? value) =>
+        value?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+}

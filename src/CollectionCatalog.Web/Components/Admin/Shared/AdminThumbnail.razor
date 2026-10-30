@@ -1,0 +1,15 @@
+@* Square thumbnail of the first photo in administration lists; a grey icon without a photo. *@
+@if (FileKey is not null)
+{
+    <img src="admin/media/@FileKey/400" alt="" loading="lazy" class="size-14 shrink-0 rounded-xl bg-stone-100 object-cover ring-1 ring-stone-200" />
+}
+else
+{
+    <div class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-stone-400 ring-1 ring-stone-200" title="@T["No photo"]">
+        <span class="icon-[lucide--image-off] size-5"></span>
+    </div>
+}
+
+@code {
+    [Parameter] public string? FileKey { get; set; }
+}

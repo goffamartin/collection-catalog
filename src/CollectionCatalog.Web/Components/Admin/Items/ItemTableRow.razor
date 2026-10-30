@@ -1,0 +1,51 @@
+@* Row of the item table – a click anywhere opens the detail, the checkbox selects for bulk actions. *@
+<tr class="@($"group cursor-pointer transition hover:bg-amber-50/40 {(Selected ? "bg-amber-50/60" : "")}")" @onclick="OnOpen">
+    <td class="py-2.5 pl-4" @onclick:stopPropagation="true">
+        <input type="checkbox" class="form-checkbox" aria-label="@T["Select {0}", Row.Name]" checked="@Selected" @onchange="OnToggle" />
+    </td>
+    <td class="py-2.5 pr-2 pl-2">
+        <AdminThumbnail FileKey="@Row.ThumbnailKey" />
+    </td>
+    <td class="px-3 py-2.5">
+        <button type="button" class="cursor-pointer text-left font-medium text-stone-900 group-hover:text-amber-700" @onclick="OnOpen" @onclick:stopPropagation="true">@Row.Name</button>
+        <div class="mt-1 flex flex-wrap items-center gap-1.5">
+            @if (Row.Visibility == ItemVisibility.Public)
+            {
+                <ItemBadge Kind="ItemBadgeKind.Public" />
+            }
+            @if (Row.HasOpenListing)
+            {
+                <ItemBadge Kind="ItemBadgeKind.InOffer" />
+            }
+            @if (Row.IsSold)
+            {
+                <ItemBadge Kind="ItemBadgeKind.Sold" />
+            }
+            @foreach (var category in Row.Categories)
+            {
+                <span class="badge ring-1" style="@CategoryColors.BadgeStyle(category.Color)">@category.Name</span>
+            }
+            <span class="text-xs text-stone-500">
+                #@Row.Id · <span class="icon-[lucide--camera] size-3 align-[-2px]"></span> @Row.ImageCount
+                <span class="sr-only">@T.Plural("{0} photo|{0} photos", Row.ImageCount)</span>
+            </span>
+        </div>
+    </td>
+    <td class="hidden px-3 py-2.5 text-stone-600 md:table-cell">
+        @Row.TypeName
+    </td>
+    <td class="hidden px-3 py-2.5 text-stone-600 lg:table-cell">@Row.CountryName</td>
+    <td class="hidden px-3 py-2.5 whitespace-nowrap text-stone-600 xl:table-cell">@Row.Years</td>
+    <td class="hidden px-3 py-2.5 text-right whitespace-nowrap text-stone-600 tabular-nums sm:table-cell">@Format.Money(Row.PurchasePrice)</td>
+    <td class="hidden px-3 py-2.5 text-right font-medium whitespace-nowrap text-stone-900 tabular-nums sm:table-cell">@Format.Money(Row.EstimatedValue)</td>
+    <td class="py-2.5 pr-4 text-right text-stone-400 group-hover:text-amber-600">
+        <span class="icon-[lucide--chevron-right] size-4"></span>
+    </td>
+</tr>
+
+@code {
+    [Parameter, EditorRequired] public AdminItemRow Row { get; set; } = null!;
+    [Parameter] public bool Selected { get; set; }
+    [Parameter] public EventCallback OnToggle { get; set; }
+    [Parameter] public EventCallback OnOpen { get; set; }
+}

@@ -1,0 +1,12 @@
+@* Logout must be a POST (with an antiforgery token), so a forged link cannot log the user out. *@
+<form action="ucet/odhlasit" method="post">
+    <AntiforgeryToken />
+    <button type="submit" class="@CssClass">
+        <span class="icon-[lucide--log-out] size-4"></span> @T["Log out"]
+    </button>
+</form>
+
+@code {
+    [Parameter]
+    public string? CssClass { get; set; }
+}

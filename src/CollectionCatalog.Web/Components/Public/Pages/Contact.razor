@@ -1,0 +1,94 @@
+@page "/kontakt"
+@inject SiteSettingsService SiteSettings
+@inject PublicItemQuery Query
+
+@if (_site is null)
+{
+    return;
+}
+
+<Seo Title="@T["Contact"]" Path="kontakt" Description="@T["Contact {0} – questions about the collection and individual pieces.", _site.SiteName]" NoIndex="_item is not null" />
+
+<div class="site-container pt-10 sm:pt-14">
+    <p class="eyebrow">@_site.SiteName</p>
+    <h1 class="display-title mt-3 text-4xl sm:text-5xl">@T["Contact"]</h1>
+    <div class="gold-rule mt-6"></div>
+
+    <div class="mt-8 grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-14">
+        <div>
+            <div class="space-y-4 text-lg leading-relaxed text-stone-700">
+                @if (_site.ContactNote is not null)
+                {
+                    <TextBlock Text="@_site.ContactNote" />
+                }
+                else
+                {
+                    <p>@T["Do you have a question about the collection or one of the pieces, or would you like to offer us something? Write to us."]</p>
+                }
+            </div>
+
+            @if (_item is not null)
+            {
+                <a href="@_item.Url" class="mt-6 flex items-center gap-4 rounded-2xl bg-white/70 p-3 pr-5 shadow-xs ring-1 ring-stone-200/80 transition hover:ring-amber-300">
+                    <span class="photo-well size-16 shrink-0 rounded-xl ring-1 ring-stone-200">
+                        @if (_item.Images.FirstOrDefault() is { } image)
+                        {
+                            <img src="@PublicUrls.Image(image.FileKey, 400)" alt="" class="size-full object-cover" />
+                        }
+                    </span>
+                    <span class="min-w-0">
+                        <span class="block text-xs text-stone-500">@T["Question about the item"]</span>
+                        <span class="block truncate font-display text-lg font-medium">@_item.Name</span>
+                    </span>
+                </a>
+            }
+
+            <InquiryForm ItemId="_item?.Id" CssClass="mt-6" Title="@T["Write to us"]" SubmitText="@T["Send message"]"
+                         Description="@T["We will reply by e-mail."]" MessagePlaceholder="@T["Hello, …"]" />
+        </div>
+
+        <aside class="space-y-4 lg:pt-1">
+            @if (_site.ContactEmail is { } email)
+            {
+                <a href="@($"mailto:{email}")" class="group flex items-center gap-4 rounded-2xl bg-white p-5 shadow-xs ring-1 ring-stone-200/80 transition hover:ring-amber-400">
+                    <span class="flex size-11 items-center justify-center rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                        <span class="icon-[lucide--mail] size-5"></span>
+                    </span>
+                    <span class="min-w-0">
+                        <span class="block text-xs text-stone-500">@T["E-mail"]</span>
+                        <span class="block truncate font-medium text-stone-900 group-hover:text-amber-800">@email</span>
+                    </span>
+                </a>
+            }
+            @if (_site.ContactPhone is { } phone)
+            {
+                <a href="@PhoneNumber.TelUri(phone)" class="group flex items-center gap-4 rounded-2xl bg-white p-5 shadow-xs ring-1 ring-stone-200/80 transition hover:ring-amber-400">
+                    <span class="flex size-11 items-center justify-center rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                        <span class="icon-[lucide--phone] size-5"></span>
+                    </span>
+                    <span class="min-w-0">
+                        <span class="block text-xs text-stone-500">@T["Phone"]</span>
+                        <span class="block truncate font-medium text-stone-900 group-hover:text-amber-800">@phone</span>
+                    </span>
+                </a>
+            }
+            <div class="rounded-2xl bg-white/60 p-5 text-sm text-stone-600 ring-1 ring-stone-200/80">
+                <p class="flex items-center gap-2 font-medium text-stone-900"><span class="icon-[lucide--tag] size-4 text-amber-700"></span> @T["Interested in buying?"]</p>
+                <p class="mt-1">@T["You will find pieces for sale in the"] <a href="nabidka" class="text-link">@AppText.In("link", "offer")</a>. @T["You can ask about a piece from the collection directly on its page."]</p>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@code {
+    private SiteInfo? _site;
+    private PublicItemDetail? _item;
+
+    [SupplyParameterFromQuery] public string? Predmet { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _item = QueryValue.Int(Predmet) is { } id ? await Query.GetDetailAsync(id) : null;
+        _site = await SiteSettings.GetAsync();
+    }
+}

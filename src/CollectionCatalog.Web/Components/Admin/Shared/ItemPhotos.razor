@@ -1,0 +1,353 @@
+@using CollectionCatalog.Web.Services.Images
+@inject ItemEditorService Editor
+@inject ILogger<ItemPhotos> Logger
+
+@* Photos of an item. Changes (upload, order, type, caption, visibility, deletion) are saved immediately. *@
+<section class="card">
+    <div class="card-header">
+        <div class="min-w-0">
+            <h2 class="card-title"><span class="icon-[lucide--images] size-4 text-amber-600"></span> @T["Photos"]</h2>
+            <p class="mt-0.5 flex items-center gap-1 text-xs text-stone-500">
+                <span class="icon-[lucide--cloud-upload] size-3.5 shrink-0"></span> @T["Saved immediately, without the Save button"]
+            </p>
+        </div>
+        @switch (_saveState)
+        {
+            case SaveState.Saving:
+                <span class="flex shrink-0 items-center gap-1.5 text-xs font-medium text-stone-500">
+                    <span class="icon-[lucide--loader-circle] size-3.5 animate-spin"></span> @T["Saving…"]
+                </span>
+                break;
+            case SaveState.Saved:
+                <span class="flex shrink-0 items-center gap-1.5 text-xs font-medium text-emerald-700">
+                    <span class="icon-[lucide--circle-check] size-3.5"></span> @T["Saved"]
+                </span>
+                break;
+            default:
+                <span class="shrink-0 text-xs text-stone-500">@T.Plural("{0} photo|{0} photos", _images.Count)</span>
+                break;
+        }
+    </div>
+
+    <div class="card-body space-y-4">
+        @if (_uploading)
+        {
+            <div class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-amber-300 bg-amber-50/50 px-4 py-6 text-center">
+                <span class="icon-[lucide--loader-circle] size-7 animate-spin text-amber-600"></span>
+                <span class="mt-2 text-sm font-medium text-stone-700">@T["Processing {0} / {1}…", _uploadDone, _uploadTotal]</span>
+            </div>
+        }
+        else
+        {
+            @* Touch devices: straight to the camera (capture) or the gallery. Mouse: drag and drop / file picker. *@
+            <div class="hidden grid-cols-2 gap-3 pointer-coarse:grid">
+                <label class="btn-accent relative py-3">
+                    <span class="icon-[lucide--camera] size-5"></span> @T["Take a photo"]
+                    <SafeInputFile OnChange="UploadAsync" accept="image/*" capture="environment" class="absolute inset-0 opacity-0" />
+                </label>
+                <label class="btn-secondary relative py-3">
+                    <span class="icon-[lucide--images] size-5"></span> @T["From the gallery"]
+                    <SafeInputFile OnChange="UploadAsync" multiple accept="image/*" class="absolute inset-0 opacity-0" />
+                </label>
+            </div>
+
+            <label class="group relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-200 px-4 py-6 text-center transition hover:border-amber-400 hover:bg-amber-50/30 pointer-coarse:hidden">
+                <span class="icon-[lucide--image-plus] size-7 text-stone-400 transition group-hover:text-amber-600"></span>
+                <span class="mt-2 text-sm font-medium text-stone-700">@T["Drag photos here or click"]</span>
+                <span class="mt-0.5 text-xs text-stone-500">@T["JPG, PNG, WebP · up to {0} MB · several at once", MaxFileSizeMb]</span>
+                <SafeInputFile OnChange="UploadAsync" multiple accept="image/*" class="absolute inset-0 cursor-pointer opacity-0" />
+            </label>
+        }
+
+        @foreach (var error in _errors)
+        {
+            <p class="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+                <span class="icon-[lucide--circle-alert] mt-px size-3.5 shrink-0"></span> @error
+            </p>
+        }
+
+        @if (_images.Count > 0)
+        {
+            <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-2">
+                @for (var index = 0; index < _images.Count; index++)
+                {
+                    var image = _images[index];
+                    var position = index;
+                    <li @key="image.Id" class="overflow-hidden rounded-xl bg-white ring-1 ring-stone-200">
+                        <div class="group relative aspect-square bg-stone-100">
+                            <a href="admin/media/@image.FileKey/1600" target="_blank" title="@T["Open large"]">
+                                <img src="admin/media/@image.FileKey/800" alt="@image.Caption[Language]" loading="lazy" class="size-full object-contain" />
+                            </a>
+                            @if (position == 0)
+                            {
+                                <span class="badge absolute top-2 left-2 bg-stone-900/80 text-white backdrop-blur"><span class="icon-[lucide--star] size-3"></span> @T["Main"]</span>
+                            }
+                            @if (!image.IsPublic)
+                            {
+                                <span class="badge absolute top-2 right-2 bg-white/90 text-stone-700 shadow-sm backdrop-blur"><span class="icon-[lucide--eye-off] size-3"></span> @T["Not public"]</span>
+                            }
+                            @if (_rotatingId == image.Id)
+                            {
+                                <div class="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                                    <span class="icon-[lucide--loader-circle] size-7 animate-spin text-amber-600"></span>
+                                </div>
+                            }
+                            <div class="absolute inset-x-2 bottom-2 flex justify-between opacity-100 transition pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100">
+                                <div class="flex gap-1">
+                                    <button type="button" class="@OverlayButton" title="@T["Move forward"]" disabled="@(position == 0 || _rotatingId is not null)" @onclick="() => MoveAsync(position, -1)">
+                                        <span class="icon-[lucide--arrow-left] size-4"></span>
+                                    </button>
+                                    <button type="button" class="@OverlayButton" title="@T["Move back"]" disabled="@(position == _images.Count - 1 || _rotatingId is not null)" @onclick="() => MoveAsync(position, 1)">
+                                        <span class="icon-[lucide--arrow-right] size-4"></span>
+                                    </button>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button type="button" class="@OverlayButton" title="@T["Rotate left"]" disabled="@(_rotatingId is not null)" @onclick="() => RotateAsync(image, clockwise: false)">
+                                        <span class="icon-[lucide--rotate-ccw] size-4"></span>
+                                    </button>
+                                    <button type="button" class="@OverlayButton" title="@T["Rotate right"]" disabled="@(_rotatingId is not null)" @onclick="() => RotateAsync(image, clockwise: true)">
+                                        <span class="icon-[lucide--rotate-cw] size-4"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5 p-2">
+                            @if (_confirmDeleteId == image.Id)
+                            {
+                                <div class="flex items-center justify-between gap-2 rounded-lg bg-red-50 px-2 py-1.5">
+                                    <span class="text-xs font-medium text-red-700">@T["Delete the photo?"]</span>
+                                    <div class="flex gap-1">
+                                        <button type="button" class="btn-ghost btn-sm" @onclick="() => _confirmDeleteId = null">@T["No"]</button>
+                                        <button type="button" class="btn-danger-solid btn-sm" @onclick="() => RemoveAsync(image)">@T["Delete"]</button>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex items-center gap-1">
+                                    <select class="form-input min-w-0 py-1.5 text-xs" aria-label="@T["Photo type"]" value="@image.ImageType"
+                                            @onchange="e => ChangeTypeAsync(image, e.Value)">
+                                        @foreach (var type in Enum.GetValues<ImageType>())
+                                        {
+                                            <option value="@type">@type.Label()</option>
+                                        }
+                                    </select>
+                                    <button type="button" class="btn-ghost btn-sm shrink-0 px-1.5" title="@(image.IsPublic ? T["Hide on the website"] : T["Show on the website"])"
+                                            @onclick="() => TogglePublicAsync(image)">
+                                        @if (image.IsPublic)
+                                        {
+                                            <span class="icon-[lucide--eye] size-4 text-emerald-600"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="icon-[lucide--eye-off] size-4 text-stone-400"></span>
+                                        }
+                                    </button>
+                                    <button type="button" class="btn-ghost btn-sm shrink-0 px-1.5 text-red-600 hover:bg-red-50 hover:text-red-700" title="@T["Delete photo"]"
+                                            @onclick="() => _confirmDeleteId = image.Id">
+                                        <span class="icon-[lucide--trash-2] size-4"></span>
+                                    </button>
+                                </div>
+                            }
+                            <input type="text" class="form-input py-1.5 text-xs" aria-label="@T["Photo caption"]" maxlength="@ItemImage.MaxCaptionLength"
+                                   placeholder="@(Language == DefaultLanguage ? T["Caption (optional)"] : image.Caption[DefaultLanguage] ?? T["Caption (optional)"])"
+                                   value="@image.Caption[Language]" @onchange="e => ChangeCaptionAsync(image, e.Value)" />
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else if (!_uploading)
+        {
+            <p class="text-center text-sm text-stone-500">@T["No photos yet. The first one uploaded will be the main one."]</p>
+        }
+    </div>
+</section>
+
+@code {
+    private const int MaxFileSizeMb = 30;
+
+    [Parameter, EditorRequired]
+    public int ItemId { get; set; }
+
+    /// <summary>Language of the captions being edited (chosen in the item editor).</summary>
+    [Parameter, EditorRequired]
+    public string Language { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public string DefaultLanguage { get; set; } = "";
+
+    private List<ItemImageModel> _images = [];
+    private readonly List<string> _errors = [];
+    private bool _uploading;
+    private int _uploadDone;
+    private int _uploadTotal;
+    private int? _confirmDeleteId;
+    private int? _rotatingId;
+
+    // State of the last save for the card header („Saving…“ → „Saved“ → the photo count again).
+    private enum SaveState { Idle, Saving, Saved }
+    private SaveState _saveState;
+    private int _saveVersion;
+
+    private const string OverlayButton = "flex size-8 items-center justify-center rounded-lg bg-white/90 text-stone-700 shadow-sm backdrop-blur hover:bg-white disabled:opacity-40";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _images = await Editor.GetImagesAsync(ItemId);
+    }
+
+    private async Task UploadAsync(InputFileChangeEventArgs e)
+    {
+        _errors.Clear();
+        var files = e.GetMultipleFiles(maximumFileCount: 50);
+        _uploading = true;
+        _uploadDone = 0;
+        _uploadTotal = files.Count;
+
+        try
+        {
+            await UploadFilesAsync(files);
+        }
+        finally
+        {
+            _uploading = false;
+        }
+        if (_uploadDone > _errors.Count)
+        {
+            ShowSaved();
+        }
+    }
+
+    private async Task UploadFilesAsync(IReadOnlyList<IBrowserFile> files)
+    {
+        foreach (var file in files)
+        {
+            try
+            {
+                // The whole file into memory – image processing needs a seekable stream.
+                await using var source = file.OpenReadStream(maxAllowedSize: MaxFileSizeMb * 1024L * 1024L);
+                using var buffer = new MemoryStream();
+                await source.CopyToAsync(buffer);
+                buffer.Position = 0;
+
+                _images.Add(await Editor.AddImageAsync(ItemId, buffer, file.Name));
+            }
+            catch (InvalidImageException)
+            {
+                _errors.Add(T["{0}: unsupported or damaged image.", file.Name]);
+            }
+            catch (IOException ex) when (file.Size > MaxFileSizeMb * 1024L * 1024L)
+            {
+                Logger.LogInformation(ex, "File too large {FileName}", file.Name);
+                _errors.Add(T["{0}: the file is larger than {1} MB.", file.Name, MaxFileSizeMb]);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                Logger.LogError(ex, "Uploading photo {FileName} failed", file.Name);
+                _errors.Add(T["{0}: the upload failed, please try again.", file.Name]);
+            }
+            _uploadDone++;
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task MoveAsync(int index, int offset)
+    {
+        var image = _images[index];
+        _images.RemoveAt(index);
+        _images.Insert(index + offset, image);
+        await SaveAsync();
+    }
+
+    private Task ChangeTypeAsync(ItemImageModel image, object? value)
+    {
+        if (Enum.TryParse<ImageType>(value?.ToString(), out var type))
+        {
+            image.ImageType = type;
+        }
+        return SaveAsync();
+    }
+
+    private Task TogglePublicAsync(ItemImageModel image)
+    {
+        image.IsPublic = !image.IsPublic;
+        return SaveAsync();
+    }
+
+    private Task ChangeCaptionAsync(ItemImageModel image, object? value)
+    {
+        image.Caption = image.Caption.With(Language, value?.ToString());
+        return SaveAsync();
+    }
+
+    private async Task RotateAsync(ItemImageModel image, bool clockwise)
+    {
+        _rotatingId = image.Id;
+        try
+        {
+            await PersistAsync(async () =>
+            {
+                var rotated = await Editor.RotateImageAsync(image.Id, clockwise);
+                var index = _images.FindIndex(i => i.Id == image.Id);
+                if (index >= 0)
+                {
+                    _images[index] = rotated;
+                }
+            });
+        }
+        finally
+        {
+            _rotatingId = null;
+        }
+    }
+
+    private async Task RemoveAsync(ItemImageModel image)
+    {
+        _confirmDeleteId = null;
+        await PersistAsync(async () =>
+        {
+            await Editor.RemoveImageAsync(image.Id);
+            _images.Remove(image);
+            await Editor.UpdateImagesAsync(ItemId, _images);
+        });
+    }
+
+    private Task SaveAsync() => PersistAsync(() => Editor.UpdateImagesAsync(ItemId, _images));
+
+    /// <summary>Saves immediately and shows the progress in the card header.</summary>
+    private async Task PersistAsync(Func<Task> save)
+    {
+        _saveState = SaveState.Saving;
+        StateHasChanged();
+        if (await SafeAction.RunAsync(Logger, "saving photos", save))
+        {
+            ShowSaved();
+            return;
+        }
+
+        _saveState = SaveState.Idle;
+        _errors.Clear();
+        _errors.Add(T["The change of photos could not be saved. Showing the saved state."]);
+        await SafeAction.RunAsync(Logger, "loading photos", async () => _images = await Editor.GetImagesAsync(ItemId));
+    }
+
+    private void ShowSaved()
+    {
+        _saveState = SaveState.Saved;
+        var version = ++_saveVersion;
+        _ = HideSavedAsync(version);
+    }
+
+    private async Task HideSavedAsync(int version)
+    {
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        // Another save may have happened meanwhile – it takes care of its own „Saved“.
+        if (version == _saveVersion)
+        {
+            _saveState = SaveState.Idle;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

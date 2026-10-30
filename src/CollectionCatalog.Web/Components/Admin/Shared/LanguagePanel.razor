@@ -1,0 +1,169 @@
+@inject LanguageService Languages
+@inject ILogger<LanguagePanel> Logger
+@inject NavigationManager Navigation
+
+@* Languages of the website: add, rename, choose the default one, delete. *@
+<div class="card max-w-3xl">
+    <div class="grid gap-3 border-b border-stone-100 p-4 text-sm text-stone-600 sm:grid-cols-2">
+        <div class="flex gap-3">
+            <span class="icon-[lucide--languages] mt-0.5 size-4 shrink-0 text-amber-600"></span>
+            <p>
+                <span class="font-medium text-stone-900">@T["Content of the website"]</span><br />
+                @T["Items, codebooks and website texts get a translation for every language listed here – edited in the forms with the language switch. Missing translations show the default language."]
+            </p>
+        </div>
+        <div class="flex gap-3">
+            <span class="icon-[lucide--file-code] mt-0.5 size-4 shrink-0 text-sky-600"></span>
+            <p>
+                <span class="font-medium text-stone-900">@T["Texts of the application"]</span><br />
+                @T["Menus, buttons and messages are not translated here but in the file {0} of the application (source code). Add a language with the same code and the file is used automatically; without it they show in English.", AppLanguages.ResourceFile("<code>")]
+            </p>
+        </div>
+    </div>
+
+    <form class="flex flex-wrap items-start gap-2 border-b border-stone-100 p-4" @onsubmit="AddAsync" @onsubmit:preventDefault="true">
+        <input class="form-input w-20" placeholder="de" maxlength="2" @bind="_newCode" aria-label="@T["Language code"]" />
+        <div class="min-w-48 flex-1">
+            <input class="form-input" placeholder="@T["Name in the language itself, e.g. Deutsch"]" maxlength="@Language.MaxNameLength" @bind="_newName" aria-label="@T["Name"]" />
+        </div>
+        <button type="submit" class="btn-primary"><span class="icon-[lucide--plus] size-4"></span> @T["Add"]</button>
+        @if (_error is not null)
+        {
+            <p class="validation-message w-full" role="alert">@_error</p>
+        }
+    </form>
+
+    <ul class="divide-y divide-stone-100">
+        @foreach (var language in Languages.All)
+        {
+            <li @key="language.Id" class="flex flex-wrap items-center gap-3 px-4 py-3">
+                @if (_editingId == language.Id)
+                {
+                    <form class="flex flex-1 flex-wrap items-start gap-2" @onsubmit="RenameAsync" @onsubmit:preventDefault="true">
+                        <div class="min-w-48 flex-1">
+                            <input class="form-input" maxlength="@Language.MaxNameLength" @bind="_editName" aria-label="@T["Name"]" autofocus />
+                        </div>
+                        <button type="submit" class="btn-primary btn-sm py-2">@T["Save"]</button>
+                        <button type="button" class="btn-ghost btn-sm py-2" @onclick="() => _editingId = null">@T["Cancel"]</button>
+                    </form>
+                }
+                else if (_deletingId == language.Id)
+                {
+                    <div class="flex flex-1 flex-wrap items-center justify-between gap-2 rounded-lg bg-red-50 px-3 py-2">
+                        <span class="text-sm text-red-800">@T["Remove {0} from the website? Translations stay stored and come back if you add the language again.", language.Name]</span>
+                        <div class="flex gap-1">
+                            <button type="button" class="btn-ghost btn-sm" @onclick="() => _deletingId = null">@T["No"]</button>
+                            <button type="button" class="btn-danger-solid btn-sm" @onclick="() => DeleteAsync(language)">@T["Delete"]</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <span class="w-8 font-mono text-xs font-semibold text-stone-500 uppercase">@language.Code</span>
+                        <span class="truncate text-sm font-medium text-stone-900">@language.Name</span>
+                        @if (language.IsDefault)
+                        {
+                            <span class="badge bg-amber-50 text-amber-700 ring-1 ring-amber-600/20">@T["Default"]</span>
+                        }
+                        <span class="text-xs text-stone-500">/@Languages.PathPrefix(language.Code)</span>
+                        @if (AppLanguages.IsTranslated(language.Code))
+                        {
+                            <span class="badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/15"
+                                  title="@(language.Code == AppLanguages.Source ? T["The texts of the application are written in English"] : AppLanguages.ResourceFile(language.Code))">
+                                <span class="icon-[lucide--check] size-3"></span> @T["Application texts"]
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-stone-100 text-stone-600" title="@T["Missing {0} – the application texts show in English.", AppLanguages.ResourceFile(language.Code)]">
+                                <span class="icon-[lucide--file-x] size-3"></span> @T["Application in English"]
+                            </span>
+                        }
+                    </div>
+                    <div class="flex gap-1">
+                        @if (!language.IsDefault)
+                        {
+                            <button type="button" class="btn-ghost btn-sm" title="@T["Make default"]" @onclick="() => SetDefaultAsync(language)">
+                                <span class="icon-[lucide--star] size-4"></span><span class="sr-only">@T["Make default"]</span>
+                            </button>
+                        }
+                        <button type="button" class="btn-ghost btn-sm" title="@T["Edit"]" @onclick="() => StartEdit(language)">
+                            <span class="icon-[lucide--pencil] size-4"></span><span class="sr-only">@T["Edit"]</span>
+                        </button>
+                        @if (!language.IsDefault)
+                        {
+                            <button type="button" class="btn-ghost btn-sm text-red-600 hover:bg-red-50 hover:text-red-700" title="@T["Delete"]" @onclick="() => _deletingId = language.Id">
+                                <span class="icon-[lucide--trash-2] size-4"></span><span class="sr-only">@T["Delete"]</span>
+                            </button>
+                        }
+                    </div>
+                }
+            </li>
+        }
+    </ul>
+
+    <p class="border-t border-stone-100 px-4 py-3 text-xs text-stone-500">
+        @T["The default language is at the root of the website (/), other languages have their code in the address (e.g. /en/)."]
+    </p>
+</div>
+
+@code {
+    private string? _newCode;
+    private string? _newName;
+    private string? _error;
+    private int? _editingId;
+    private string? _editName;
+    private int? _deletingId;
+
+    private async Task AddAsync()
+    {
+        string? error = null;
+        _error = await SafeAction.RunAsync(Logger, "adding a language", async () => error = await Languages.AddAsync(_newCode, _newName))
+            ? error
+            : T[SafeAction.Message].Value;
+        if (_error is null)
+        {
+            _newCode = _newName = null;
+        }
+    }
+
+    private void StartEdit(LanguageInfo language)
+    {
+        _deletingId = null;
+        _editingId = language.Id;
+        _editName = language.Name;
+    }
+
+    private async Task RenameAsync()
+    {
+        string? error = null;
+        _error = await SafeAction.RunAsync(Logger, "renaming a language", async () => error = await Languages.RenameAsync(_editingId!.Value, _editName))
+            ? error
+            : T[SafeAction.Message].Value;
+        if (_error is null)
+        {
+            _editingId = null;
+        }
+    }
+
+    private async Task SetDefaultAsync(LanguageInfo language)
+    {
+        if (!await SafeAction.RunAsync(Logger, "changing the default language", () => Languages.SetDefaultAsync(language.Id)))
+        {
+            _error = T[SafeAction.Message];
+            return;
+        }
+        // The default language moved to the root of the website – reload there (also restarts the interactive circuit).
+        Navigation.NavigateTo($"/{AdminUrls.Codebooks}?sekce=jazyky", forceLoad: true);
+    }
+
+    private async Task DeleteAsync(LanguageInfo language)
+    {
+        string? error = null;
+        _error = await SafeAction.RunAsync(Logger, "deleting a language", async () => error = await Languages.DeleteAsync(language.Id))
+            ? error
+            : T[SafeAction.Message].Value;
+        _deletingId = null;
+    }
+}
