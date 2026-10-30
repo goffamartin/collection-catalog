@@ -88,7 +88,7 @@ public sealed class UserAccountTests
 
         for (var i = 0; i < users.Options.Lockout.MaxFailedAccessAttempts; i++)
         {
-            await signIn.CheckPasswordSignInAsync(user, "spatne-heslo", lockoutOnFailure: true);
+            await signIn.CheckPasswordSignInAsync(user, "wrong-password", lockoutOnFailure: true);
         }
 
         var result = await signIn.CheckPasswordSignInAsync(user, Password, lockoutOnFailure: true);

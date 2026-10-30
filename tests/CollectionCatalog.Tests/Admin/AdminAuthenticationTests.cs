@@ -17,6 +17,9 @@ public sealed partial class AdminAuthenticationTests
     private const string UserName = "curator";
     private const string Password = "test-password-123";
 
+    // A failed sign-in raises the failed-attempt counter of the account; parallel successful sign-ins of the same
+    // account would then both reset it and one of them fails on the concurrency stamp – so wrong passwords use their own.
+    private const string WrongPasswordUserName = "visitor";
 
     private static TestWebApp _app = null!;
 
@@ -27,8 +30,11 @@ public sealed partial class AdminAuthenticationTests
 
         await using var scope = _app.Services.CreateAsyncScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-        var result = await userManager.CreateAsync(new AppUser { UserName = UserName, DisplayName = "Curator" }, Password);
-        Assert.IsTrue(result.Succeeded, string.Join(", ", result.Errors.Select(e => e.Description)));
+        foreach (var (userName, displayName) in new[] { (UserName, "Curator"), (WrongPasswordUserName, "Visitor") })
+        {
+            var result = await userManager.CreateAsync(new AppUser { UserName = userName, DisplayName = displayName }, Password);
+            Assert.IsTrue(result.Succeeded, string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
     }
 
     [ClassCleanup]
@@ -90,7 +96,7 @@ public sealed partial class AdminAuthenticationTests
     {
         using var client = _app.CreateClient(cookies: true);
 
-        var response = await LoginAsync(client, "spatne-heslo");
+        var response = await LoginAsync(client, "wrong-password", userName: WrongPasswordUserName);
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         StringAssert.Contains(WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()), "Incorrect user name or password");
@@ -103,7 +109,7 @@ public sealed partial class AdminAuthenticationTests
         using var attacker = _app.CreateClient(cookies: true);
         for (var i = 0; i < LoginAttemptLimiter.MaxFailures; i++)
         {
-            await LoginAsync(attacker, "spatne-heslo", userName: "neexistuje");
+            await LoginAsync(attacker, "wrong-password", userName: "nobody");
         }
 
         var blocked = await LoginAsync(attacker, Password);
