@@ -121,6 +121,23 @@ public sealed partial class AdminAuthenticationTests
     }
 
     [TestMethod]
+    public async Task Login_WithoutCloudflareTunnel_IgnoresClientIpHeader()
+    {
+        // Without the tunnel CF-Connecting-IP comes from the client itself – a new value must not lift the block.
+        using var app = new TestWebApp(new Dictionary<string, string> { ["Proxy:CloudflareTunnel"] = "false" });
+        using var attacker = app.CreateClient(cookies: true);
+        for (var i = 0; i < LoginAttemptLimiter.MaxFailures; i++)
+        {
+            await LoginAsync(attacker, "wrong-password", userName: "nobody");
+        }
+
+        using var spoofedIp = app.CreateClient(cookies: true);
+        var response = await LoginAsync(spoofedIp, "wrong-password", userName: "nobody");
+
+        StringAssert.Contains(WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()), "Too many failed sign-in attempts");
+    }
+
+    [TestMethod]
     [DataRow("//evil.example/admin")]
     [DataRow("/\\evil.example")]
     [DataRow("https://evil.example/")]

@@ -20,6 +20,8 @@ public sealed class TestWebApp : IDisposable
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting("Storage:DataPath", DataPath);
+            // Clients get their own IP through CF-Connecting-IP (see CreateClient).
+            builder.UseSetting("Proxy:CloudflareTunnel", "true");
             foreach (var (key, value) in settings ?? new Dictionary<string, string>())
             {
                 builder.UseSetting(key, value);

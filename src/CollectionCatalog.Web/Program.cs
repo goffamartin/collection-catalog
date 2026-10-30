@@ -53,16 +53,22 @@ builder.Services.AddAntiforgery(options =>
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>();
 
-// The app runs behind a Cloudflare Tunnel, which terminates TLS. The container is not reachable from the internet directly,
-// so proxies are not restricted to specific addresses.
-// The visitor's IP comes from CF-Connecting-IP: Cloudflare always sets it itself (overwriting a client's value),
-// whereas a client can append to X-Forwarded-For – and so bypass the per-IP limits of sign-in and inquiries.
+// The visitor's IP feeds the per-IP limits of sign-in and inquiries, so forwarded headers are trusted only from a proxy.
+// By default only from a reverse proxy on the same machine (loopback, the ASP.NET Core default).
+// Proxy:CloudflareTunnel = true – the app runs behind a Cloudflare Tunnel, which terminates TLS, and is not reachable from
+// the internet directly, so proxies are not restricted to specific addresses. The visitor's IP comes from CF-Connecting-IP:
+// Cloudflare always sets it itself (overwriting a client's value), whereas a client can append to X-Forwarded-For.
+// Without the tunnel the header would come straight from the client – never enable it then.
+var behindCloudflareTunnel = builder.Configuration.GetValue<bool>("Proxy:CloudflareTunnel");
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.ForwardedForHeaderName = "CF-Connecting-IP";
-    options.KnownIPNetworks.Clear();
-    options.KnownProxies.Clear();
+    if (behindCloudflareTunnel)
+    {
+        options.ForwardedForHeaderName = "CF-Connecting-IP";
+        options.KnownIPNetworks.Clear();
+        options.KnownProxies.Clear();
+    }
 });
 
 var app = builder.Build();
@@ -91,7 +97,7 @@ app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages:
 app.UseRouting();
 
 // Explicitly after UseForwardedHeaders – otherwise WebApplication adds them automatically at the start of the pipeline
-// and sign-in redirects and cookies would use the http scheme instead of https (behind the Cloudflare Tunnel).
+// and sign-in redirects and cookies would use the http scheme instead of https (behind a TLS-terminating proxy).
 app.UseAuthentication();
 app.UseAuthorization();
 

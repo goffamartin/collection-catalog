@@ -45,8 +45,10 @@ collection. Overview, features and configuration: `README.md`.
   ImageSharp (licensing).
 - Persistent data only under `StorageOptions.DataPath` (locally `src/CollectionCatalog.Web/App_Data`, `/data` in the
   container).
-- Visitor IP = header `CF-Connecting-IP` (ForwardedHeaders in Program.cs) – used by `InquiryRateLimiter` and
-  `LoginAttemptLimiter` (5 failures / 30 min). Web tests give every client its own `CF-Connecting-IP`.
+- Visitor IP (ForwardedHeaders in Program.cs) – used by `InquiryRateLimiter` and `LoginAttemptLimiter`
+  (5 failures / 30 min). Forwarded headers are trusted only from loopback; with `Proxy:CloudflareTunnel=true` the IP
+  comes from `CF-Connecting-IP` (never enable it without the tunnel). Web tests enable it and give every client its own
+  `CF-Connecting-IP`.
 - Sign-in: Identity, user name + password, no registration; accounts only via the CLI `user-set-password`.
 - CLI commands (`Infrastructure/CliCommands.cs`): `user-set-password`, `seed-demo` – run instead of the web server,
   migrations are applied first; the command must be the **first argument**.

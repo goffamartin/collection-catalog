@@ -81,7 +81,8 @@ Settings live in `src/CollectionCatalog.Web/appsettings.json`:
   "Currency": "EUR",
   "AuthorName": "",
   "AuthorUrl": ""
-}
+},
+"Proxy": { "CloudflareTunnel": false }
 ```
 
 | Setting | Default | Purpose |
@@ -92,6 +93,7 @@ Settings live in `src/CollectionCatalog.Web/appsettings.json`:
 | `Site:Currency` | `EUR` | Currency of prices (ISO 4217 code, e.g. `CZK`, `USD`) |
 | `Site:AuthorName` | – | Author credit in the footer (hidden when empty) |
 | `Site:AuthorUrl` | – | Link of the author credit |
+| `Proxy:CloudflareTunnel` | `false` | Behind a Cloudflare Tunnel: take the visitor's IP from `CF-Connecting-IP` and the scheme from any proxy. Otherwise forwarded headers are trusted only from a reverse proxy on the same machine. Never enable it without the tunnel – clients could fake their IP and bypass the sign-in limit. |
 
 As usual in ASP.NET Core, any setting can be overridden by an environment variable (`Site__Currency=CZK`).
 
